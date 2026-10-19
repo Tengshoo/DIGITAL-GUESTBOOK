@@ -172,8 +172,8 @@ export default function WallModePage() {
 
   return (
     <div
-      className={`relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-[#181310] text-[#FAF8F5] select-none transition-all ${
-        isFullscreen ? 'fixed inset-0 z-50 p-4 sm:p-8' : 'p-4 sm:p-8'
+      className={`relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-between overflow-x-hidden bg-[#181310] text-[#FAF8F5] select-none transition-all pb-[env(safe-area-inset-bottom,0px)] ${
+        isFullscreen ? 'fixed inset-0 z-50 p-3 sm:p-8' : 'p-3 sm:p-8'
       }`}
       style={{
         backgroundImage: `

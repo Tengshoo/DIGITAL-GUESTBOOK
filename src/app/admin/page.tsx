@@ -196,8 +196,8 @@ export default function AdminDashboardPage() {
   // Unauthenticated PIN Form View
   if (!isAuthenticated) {
     return (
-      <div className="w-full max-w-md mx-auto px-4 py-16 sm:py-24 animate-fade-up">
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 border border-champagne-200/80 shadow-polaroid text-center">
+      <div className="w-full min-h-[100dvh] flex items-center justify-center max-w-md mx-auto px-4 py-16 sm:py-24 animate-fade-up">
+        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 border border-champagne-200/80 shadow-polaroid text-center w-full">
           <div className="w-16 h-16 rounded-full bg-champagne-100 mx-auto mb-4 flex items-center justify-center text-champagne-700 shadow-champagne">
             <Lock className="w-8 h-8" />
           </div>
@@ -255,7 +255,7 @@ export default function AdminDashboardPage() {
 
   // Authenticated Dashboard View
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:py-10 animate-fade-in">
+    <div className="w-full min-h-[100dvh] max-w-7xl mx-auto px-4 py-8 sm:py-10 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] animate-fade-in">
       {/* Toast Notification */}
       {actionMessage && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-2xl bg-warm-900 text-white text-xs font-medium shadow-2xl flex items-center gap-2 animate-fade-up">
@@ -388,7 +388,7 @@ export default function AdminDashboardPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name or message..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl border border-warm-200 bg-warm-50/40 text-xs text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-champagne-400"
+            className="w-full pl-9 pr-4 py-2 rounded-xl border border-warm-200 bg-warm-50/40 text-[16px] sm:text-xs text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-champagne-400"
           />
         </div>
 
@@ -575,7 +575,7 @@ export default function AdminDashboardPage() {
           onClick={() => setPreviewImage(null)}
         >
           <div
-            className="relative max-w-2xl max-h-[90vh] bg-white rounded-3xl p-3 shadow-2xl border-2 border-champagne-300"
+            className="relative max-w-2xl max-h-[90dvh] bg-white rounded-3xl p-3 shadow-2xl border-2 border-champagne-300"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -588,7 +588,7 @@ export default function AdminDashboardPage() {
             <img
               src={previewImage}
               alt="Enlarged preview"
-              className="max-h-[80vh] w-auto mx-auto rounded-2xl object-contain"
+              className="max-h-[80dvh] w-auto mx-auto rounded-2xl object-contain"
             />
           </div>
         </div>

@@ -67,8 +67,11 @@ export default function GuestbookPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      setErrorMsg('Sila pilih fail gambar yang sah (JPEG/PNG).');
+    const isImage = file.type
+      ? file.type.startsWith('image/')
+      : /\.(jpe?g|png|webp|heic|heif|gif)$/i.test(file.name);
+    if (!isImage && file.type) {
+      setErrorMsg('Sila pilih fail gambar yang sah (JPEG/PNG/HEIC).');
       return;
     }
 
@@ -220,10 +223,10 @@ export default function GuestbookPage() {
     PHOTO_FRAMES.find((f) => f.id === selectedFrame) || PHOTO_FRAMES[0];
 
   return (
-    <div className="relative w-full min-h-screen flex flex-col justify-between overflow-x-hidden text-white select-none">
+    <div className="relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-between overflow-x-hidden text-white select-none">
       {/* 1. Full-Bleed Cinematic Background */}
       <div
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
+        className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105 pointer-events-none"
         style={{ backgroundImage: `url(${eventDetails.bgImage})` }}
       >
         {/* Dark Vignette Overlay */}
@@ -306,7 +309,7 @@ export default function GuestbookPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Masukkan nama anda..."
-              className="w-full px-4 py-3.5 rounded-2xl border border-white/25 bg-white/10 text-white placeholder-white/50 text-center text-sm font-medium focus:outline-none focus:ring-2 focus:ring-champagne-400 focus:bg-black/40 transition"
+              className="w-full px-4 py-3.5 rounded-2xl border border-white/25 bg-white/10 text-white placeholder-white/50 text-center text-[16px] sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-champagne-400 focus:bg-black/40 transition"
             />
           </div>
 
@@ -339,7 +342,10 @@ export default function GuestbookPage() {
       {/* 5. Interactive Submission Modal / Sheet */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-lg max-h-[92vh] overflow-y-auto bg-[#FAF8F5] text-warm-900 rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border-t sm:border border-champagne-300 relative animate-fade-up">
+          <div className="w-full max-w-lg max-h-[90dvh] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-[#FAF8F5] text-warm-900 rounded-t-3xl sm:rounded-3xl p-5 sm:p-8 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] shadow-2xl border-t sm:border border-champagne-300 relative animate-fade-up">
+            {/* Mobile bottom-sheet drag handle */}
+            <div className="w-12 h-1.5 bg-warm-300 rounded-full mx-auto -mt-1 mb-3.5 sm:hidden" />
+
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-warm-200">
               <div className="flex items-center gap-2">
@@ -427,7 +433,7 @@ export default function GuestbookPage() {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Contoh: Sarah & Michael"
                     maxLength={100}
-                    className="w-full px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-champagne-400 text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-champagne-400 text-[16px] sm:text-sm"
                   />
                 </div>
 
@@ -447,7 +453,7 @@ export default function GuestbookPage() {
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Tuliskan ucapan tahniah, doa keberkatan, atau memori bersama pasangan..."
                     maxLength={2000}
-                    className="w-full px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-champagne-400 text-sm resize-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-champagne-400 text-[16px] sm:text-sm resize-none"
                   />
                   <span className="text-[10px] text-right text-warm-400">
                     {message.length} / 2000 aksara
@@ -514,6 +520,9 @@ export default function GuestbookPage() {
                         type="file"
                         accept="image/*"
                         capture="user"
+                        onClick={(e) => {
+                          (e.target as HTMLInputElement).value = '';
+                        }}
                         onChange={handlePhotoUpload}
                         className="hidden"
                       />
@@ -521,6 +530,9 @@ export default function GuestbookPage() {
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
+                        onClick={(e) => {
+                          (e.target as HTMLInputElement).value = '';
+                        }}
                         onChange={handlePhotoUpload}
                         className="hidden"
                       />

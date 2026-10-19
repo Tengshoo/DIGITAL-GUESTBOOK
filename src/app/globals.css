@@ -9,10 +9,18 @@
   --foreground: #261E18;
 }
 
+/* Global Mobile & Touch Optimization */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: 
@@ -21,6 +29,17 @@ body {
     radial-gradient(at 50% 100%, rgba(244, 236, 225, 0.3) 0px, transparent 50%);
   background-attachment: fixed;
   min-height: 100vh;
+  min-height: 100dvh;
+  /* Support iPhone notch and bottom gesture bar */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Responsive touch control: prevent 300ms double-tap zoom delay on buttons */
+button, a, input, textarea, select {
+  touch-action: manipulation;
 }
 
 /* Custom scrollbars */

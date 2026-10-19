@@ -51,20 +51,41 @@ export default function VoiceRecorder({ onChange, disabled = false }: VoiceRecor
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      // Determine supported mime type
+      // Determine supported mime type on iOS Safari vs Android Chrome
       let mimeType = '';
-      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-        mimeType = 'audio/webm;codecs=opus';
-      } else if (MediaRecorder.isTypeSupported('audio/webm')) {
-        mimeType = 'audio/webm';
-      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-        mimeType = 'audio/mp4';
-      } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
-        mimeType = 'audio/ogg';
+      const candidateTypes = [
+        'audio/mp4',
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/aac',
+        'audio/ogg',
+        'audio/wav',
+      ];
+
+      if (
+        typeof MediaRecorder !== 'undefined' &&
+        typeof MediaRecorder.isTypeSupported === 'function'
+      ) {
+        for (const type of candidateTypes) {
+          try {
+            if (MediaRecorder.isTypeSupported(type)) {
+              mimeType = type;
+              break;
+            }
+          } catch {
+            // Some in-app browsers throw on isTypeSupported
+          }
+        }
       }
 
-      const options = mimeType ? { mimeType } : undefined;
-      const mediaRecorder = new MediaRecorder(stream, options);
+      let mediaRecorder: MediaRecorder;
+      try {
+        const options = mimeType ? { mimeType } : undefined;
+        mediaRecorder = new MediaRecorder(stream, options);
+      } catch {
+        // Fallback for mobile browsers that reject custom options
+        mediaRecorder = new MediaRecorder(stream);
+      }
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {

@@ -46,6 +46,8 @@ export default function AudioPlayer({ src, label = 'Listen to Voice Wish', class
         <audio
           ref={audioRef}
           src={src}
+          playsInline
+          preload="metadata"
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded}
           className="hidden"
@@ -74,6 +76,8 @@ export default function AudioPlayer({ src, label = 'Listen to Voice Wish', class
       <audio
         ref={audioRef}
         src={src}
+        playsInline
+        preload="metadata"
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
         className="hidden"
