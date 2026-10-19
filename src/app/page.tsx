@@ -27,6 +27,7 @@ import PhotoFrameSelector, {
   LivePhotoFrameOverlay,
   applyFilterAndFrameToCanvas,
 } from '@/components/PhotoFrameSelector';
+import { submitGuestbookEntry } from '@/lib/supabase';
 
 export default function GuestbookPage() {
   // Event details matching the demo
@@ -171,21 +172,15 @@ export default function GuestbookPage() {
         );
       }
 
-      const res = await fetch('/api/entries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          message: message.trim(),
-          photo_url: finalPhotoUrl,
-          signature_svg: null,
-          audio_url: voiceBase64,
-        }),
+      const result = await submitGuestbookEntry({
+        name: name.trim(),
+        message: message.trim(),
+        photo_url: finalPhotoUrl,
+        audio_url: voiceBase64,
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Gagal menghantar ucapan.');
+      if (!result.success) {
+        throw new Error(result.error || 'Gagal menghantar ucapan.');
       }
 
       setIsSuccess(true);

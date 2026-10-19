@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import AudioPlayer from '@/components/AudioPlayer';
+import { getApprovedEntries, getSupabase } from '@/lib/supabase';
 
 interface GuestEntry {
   id: number;
@@ -52,16 +53,15 @@ export default function WallModePage() {
     }
   }, []);
 
-  // Fetch approved entries from backend
+  // Fetch approved entries from Supabase / Local data
   const fetchEntries = useCallback(async () => {
     try {
-      const res = await fetch('/api/entries', { cache: 'no-store' });
-      const data = await res.json();
-      if (data.success && Array.isArray(data.entries)) {
+      const data = await getApprovedEntries();
+      if (Array.isArray(data)) {
         setEntries((prev) => {
           // If counts changed or IDs differ, update
-          if (JSON.stringify(data.entries) !== JSON.stringify(prev)) {
-            return data.entries;
+          if (JSON.stringify(data) !== JSON.stringify(prev)) {
+            return data;
           }
           return prev;
         });
@@ -71,7 +71,28 @@ export default function WallModePage() {
     }
   }, []);
 
-  // Initial load and polling every 5 seconds
+  // Realtime subscription if Supabase is active
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
+    const channel = supabase
+      .channel('entries_realtime_wall')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'entries' },
+        () => {
+          fetchEntries();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchEntries]);
+
+  // Initial load and polling fallback every 5 seconds
   useEffect(() => {
     fetchEntries();
     const pollId = setInterval(fetchEntries, POLL_INTERVAL);

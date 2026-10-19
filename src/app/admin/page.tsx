@@ -21,6 +21,11 @@ import {
 } from 'lucide-react';
 import AudioPlayer from '@/components/AudioPlayer';
 import Link from 'next/link';
+import {
+  getAllEntriesForAdmin,
+  updateEntryApproval,
+  deleteGuestEntry,
+} from '@/lib/supabase';
 
 interface AdminEntry {
   id: number;
@@ -59,20 +64,17 @@ export default function AdminDashboardPage() {
     setIsLoading(true);
     setLoginError(null);
     try {
-      const res = await fetch(`/api/admin/entries?pin=${encodeURIComponent(currentPin)}`, {
-        headers: { 'x-admin-pin': currentPin },
-        cache: 'no-store',
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Invalid PIN or access denied');
+      const correctPin = process.env.NEXT_PUBLIC_ADMIN_PIN || '2026';
+      if (currentPin !== correctPin) {
+        throw new Error('PIN keselamatan tidak sah.');
       }
 
-      setEntries(data.entries || []);
+      const data = await getAllEntriesForAdmin();
+      setEntries(data);
       setIsAuthenticated(true);
       sessionStorage.setItem('admin_guestbook_pin', currentPin);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Invalid PIN';
+      const msg = err instanceof Error ? err.message : 'PIN keselamatan tidak sah';
       setLoginError(msg);
       setIsAuthenticated(false);
       sessionStorage.removeItem('admin_guestbook_pin');
@@ -99,51 +101,37 @@ export default function AdminDashboardPage() {
   const toggleApproval = async (id: number, currentStatus: number) => {
     try {
       const newStatus = currentStatus === 1 ? 0 : 1;
-      const res = await fetch('/api/admin/entries', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-pin': pin,
-        },
-        body: JSON.stringify({ id, is_approved: newStatus, pin }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to update status');
+      const success = await updateEntryApproval(id, newStatus);
+      if (!success) {
+        throw new Error('Gagal mengemaskini status entri.');
       }
 
       setEntries((prev) =>
         prev.map((e) => (e.id === id ? { ...e, is_approved: newStatus } : e))
       );
-      showFlashMessage(`Entry #${id} is now ${newStatus === 1 ? 'Approved' : 'Hidden'}`);
+      showFlashMessage(`Entri #${id} kini ${newStatus === 1 ? 'Dipaparkan' : 'Disembunyikan'}`);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Update failed';
+      const msg = err instanceof Error ? err.message : 'Kemaskini gagal';
       alert(msg);
     }
   };
 
   const handleDelete = async (id: number, name: string) => {
     const confirmDelete = window.confirm(
-      `Are you sure you want to permanently delete the entry from "${name}" (#${id})?`
+      `Adakah anda pasti mahu memadamkan ucapan daripada "${name}" (#${id})?`
     );
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`/api/admin/entries?id=${id}&pin=${encodeURIComponent(pin)}`, {
-        method: 'DELETE',
-        headers: { 'x-admin-pin': pin },
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to delete entry');
+      const success = await deleteGuestEntry(id);
+      if (!success) {
+        throw new Error('Gagal memadamkan entri');
       }
 
       setEntries((prev) => prev.filter((e) => e.id !== id));
-      showFlashMessage(`Entry #${id} from "${name}" deleted.`);
+      showFlashMessage(`Entri #${id} daripada "${name}" berjaya dipadam.`);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Delete failed';
+      const msg = err instanceof Error ? err.message : 'Pemadaman gagal';
       alert(msg);
     }
   };
