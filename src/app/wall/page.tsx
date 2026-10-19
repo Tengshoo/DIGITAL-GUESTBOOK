@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
+  ArrowLeft,
   Maximize,
   Minimize,
   Play,
@@ -169,6 +170,15 @@ export default function WallModePage() {
       {/* Top Header Bar */}
       <header className="relative z-10 flex items-center justify-between gap-4 max-w-7xl mx-auto w-full pb-4">
         <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            title="Kembali ke Laman Utama / Back to Home"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-warm-900/80 hover:bg-champagne-600/90 border border-warm-700/80 hover:border-champagne-400 text-warm-200 hover:text-white text-xs font-medium transition shadow-md group"
+          >
+            <ArrowLeft className="w-4 h-4 text-champagne-300 group-hover:text-white group-hover:-translate-x-0.5 transition-transform" />
+            <span className="hidden sm:inline">Home</span>
+          </Link>
+
           <div className="w-10 h-10 rounded-full bg-champagne-500/20 border border-champagne-400/40 flex items-center justify-center text-champagne-300 shadow-champagne">
             <Heart className="w-5 h-5 fill-rose-500/40 text-rose-300" />
           </div>
@@ -424,7 +434,14 @@ export default function WallModePage() {
           )}
 
           {/* Quick link to sign */}
-          <div className="ml-auto flex items-center gap-4">
+          <div className="ml-auto flex items-center gap-4 text-xs">
+            <Link
+              href="/"
+              className="text-warm-400 hover:text-champagne-300 transition flex items-center gap-1"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Laman Utama</span>
+            </Link>
             <button
               onClick={() => setShowQrModal(true)}
               className="hidden sm:flex items-center gap-1.5 text-champagne-300 hover:text-champagne-100 underline decoration-champagne-500/50 underline-offset-4"
