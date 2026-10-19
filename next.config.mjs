@@ -4,18 +4,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// When running in GitHub Actions without a custom domain, use repository subpath
-const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
-const repoSubpath = process.env.GITHUB_REPOSITORY
-  ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}`
-  : '/DIGITAL-GUESTBOOK';
-
-const basePath =
-  process.env.NEXT_PUBLIC_BASE_PATH !== undefined
-    ? process.env.NEXT_PUBLIC_BASE_PATH
-    : isGitHubActions
-    ? repoSubpath
-    : '';
+// Base path is empty since this repository uses a custom domain (atifismagallery.memoira.art)
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

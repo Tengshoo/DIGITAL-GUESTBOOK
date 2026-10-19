@@ -33,7 +33,7 @@ jobs:
 
       - name: Build static website
         env:
-          NEXT_PUBLIC_BASE_PATH: '/DIGITAL-GUESTBOOK'
+          NEXT_PUBLIC_BASE_PATH: ''
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_ADMIN_PIN: ${{ secrets.NEXT_PUBLIC_ADMIN_PIN }}
