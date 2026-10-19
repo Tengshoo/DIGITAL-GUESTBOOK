@@ -46,10 +46,11 @@ export default function WallModePage() {
   const cycleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Setup QR origin URL once on client
+  // Setup QR origin URL once on client with basePath support
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setQrOrigin(window.location.origin);
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+      setQrOrigin(`${window.location.origin}${basePath}`);
     }
   }, []);
 

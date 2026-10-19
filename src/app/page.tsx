@@ -28,6 +28,7 @@ import PhotoFrameSelector, {
   applyFilterAndFrameToCanvas,
 } from '@/components/PhotoFrameSelector';
 import { submitGuestbookEntry } from '@/lib/supabase';
+import { getAssetPath } from '@/lib/assets';
 
 export default function GuestbookPage() {
   // Event details matching the demo
@@ -39,8 +40,8 @@ export default function GuestbookPage() {
     hashtag: '#ArmanFarah',
     welcomeMessage:
       'Kongsi gambar, video, atau momen indah yang anda rakam bersama kami.',
-    bgImage: '/assets/img/arman-farah-venue.jpg',
-    avatarImage: '/assets/img/arman-farah-welcome.jpg',
+    bgImage: getAssetPath('/assets/img/arman-farah-venue.jpg'),
+    avatarImage: getAssetPath('/assets/img/arman-farah-welcome.jpg'),
   };
 
   // Form states
