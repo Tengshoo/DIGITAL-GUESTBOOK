@@ -41,7 +41,7 @@ export default function GuestbookPage() {
     hashtag: '#ArmanFarah',
     welcomeMessage:
       'Kongsi gambar, video, atau momen indah yang anda rakam bersama kami.',
-    bgImage: getAssetPath('/assets/img/arman-farah-venue.jpg'),
+    bgImage: getAssetPath('/assets/img/arman-farah-venue.png?v=2'),
     avatarImage: getAssetPath('/assets/img/arman-farah-welcome.jpg'),
   };
 
@@ -265,7 +265,7 @@ export default function GuestbookPage() {
         style={{ backgroundImage: `url(${eventDetails.bgImage})` }}
       >
         {/* Dark Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/60 to-black/85 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-black/75" />
       </div>
 
       {/* 2. Top Event Navigation Bar */}
