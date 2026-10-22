@@ -29,6 +29,7 @@ import PhotoFrameSelector, {
 } from '@/components/PhotoFrameSelector';
 import PhotoboothStudio from '@/components/Photobooth/PhotoboothStudio';
 import { submitGuestbookEntry } from '@/lib/supabase';
+import { uploadPhotoToGoogleDrive } from '@/lib/googleDrive';
 import { getAssetPath } from '@/lib/assets';
 import { useLanguage, LanguageToggle } from '@/lib/i18n';
 
@@ -223,6 +224,13 @@ export default function GuestbookPage() {
           selectedFilter,
           selectedFrame
         );
+
+        // Upload photo/photobooth strip to Google Drive folder
+        uploadPhotoToGoogleDrive({
+          photoBase64: finalPhotoUrl,
+          guestName: name.trim(),
+          message: message.trim(),
+        }).catch((err) => console.warn('Google Drive background upload:', err));
       }
 
       const result = await submitGuestbookEntry({

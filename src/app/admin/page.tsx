@@ -18,6 +18,7 @@ import {
   Calendar,
   Sparkles,
   ArrowUpDown,
+  FolderOpen,
 } from 'lucide-react';
 import AudioPlayer from '@/components/AudioPlayer';
 import Link from 'next/link';
@@ -26,6 +27,7 @@ import {
   updateEntryApproval,
   deleteGuestEntry,
 } from '@/lib/supabase';
+import { getGoogleDriveFolderUrl } from '@/lib/googleDrive';
 
 interface AdminEntry {
   id: number;
@@ -293,6 +295,18 @@ export default function AdminDashboardPage() {
 
           {/* Export Dropdown / Buttons */}
           <div className="flex items-center gap-1">
+            {getGoogleDriveFolderUrl() && (
+              <a
+                href={getGoogleDriveFolderUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 text-xs font-semibold transition shadow-sm"
+                title="Buka Folder Google Drive"
+              >
+                <FolderOpen className="w-3.5 h-3.5 text-blue-600" />
+                <span>Google Drive</span>
+              </a>
+            )}
             <button
               onClick={exportAsCsv}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-champagne-100/80 hover:bg-champagne-200/80 text-champagne-900 border border-champagne-300/80 text-xs font-medium transition shadow-sm"
