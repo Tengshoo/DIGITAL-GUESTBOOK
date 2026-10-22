@@ -65,6 +65,9 @@ export default function PhotoboothStudio({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false);
+  const [isCameraLoading, setIsCameraLoading] = useState(true);
+  const [isFlipping, setIsFlipping] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
 
   // Countdown & auto-booth flow
@@ -104,33 +107,94 @@ export default function PhotoboothStudio({
     }
   }, []);
 
-  // Initialize Camera
+  // Initialize Camera with robust mobile WebKit/Safari support
   const startCamera = useCallback(async () => {
+    setIsCameraLoading(true);
     setCameraError(null);
+    setIsCameraReady(false);
+
     try {
+      // 1. Clean up any existing stream tracks first
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
       }
 
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Kamera tidak disokong pada pelayar ini.');
+      if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+        throw new Error('Kamera tidak disokong pada pelayar atau peranti ini.');
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode,
-          width: { ideal: 1280 },
-          height: { ideal: 960 },
-        },
-        audio: false,
-      });
+      // 2. Request user media with ideal constraints, with progressive fallback
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: 1280, min: 640 },
+            height: { ideal: 960, min: 480 },
+          },
+          audio: false,
+        });
+      } catch (errConstraint) {
+        console.warn('Initial camera constraints failed, attempting basic fallback:', errConstraint);
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { ideal: facingMode },
+            },
+            audio: false,
+          });
+        } catch {
+          // Final fallback: any available video device
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+          });
+        }
+      }
 
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
+
+      // 3. Attach immediately to video element
+      const video = videoRef.current;
+      if (video) {
+        // Essential attributes for iOS Safari WebKit inline playback
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.muted = true;
+        video.srcObject = stream;
+
+        // Listen for metadata load & playback start
+        const handleLoaded = async () => {
+          try {
+            await video.play();
+            setIsCameraReady(true);
+            setIsCameraActive(true);
+            setIsCameraLoading(false);
+          } catch (e) {
+            console.warn('video.play() failed on metadata load:', e);
+            setIsCameraActive(true);
+            setIsCameraLoading(false);
+          }
+        };
+
+        if (video.readyState >= 2) {
+          handleLoaded();
+        } else {
+          video.onloadedmetadata = handleLoaded;
+        }
+
+        video.play().then(() => {
+          setIsCameraReady(true);
+          setIsCameraActive(true);
+          setIsCameraLoading(false);
+        }).catch(() => {
+          // Will be handled by onLoadedMetadata or user gesture
+        });
+      } else {
+        setIsCameraActive(true);
+        setIsCameraLoading(false);
       }
-      setIsCameraActive(true);
     } catch (err: unknown) {
       console.warn('Camera permission or init failed:', err);
       const msg =
@@ -139,6 +203,8 @@ export default function PhotoboothStudio({
           : 'Sila benarkan akses kamera untuk menggunakan photobooth.';
       setCameraError(msg);
       setIsCameraActive(false);
+      setIsCameraReady(false);
+      setIsCameraLoading(false);
     }
   }, [facingMode]);
 
@@ -152,9 +218,41 @@ export default function PhotoboothStudio({
     };
   }, [startCamera]);
 
-  // Toggle front/back camera
+  // Double-safety guard: ensure videoRef always gets attached if stream exists
+  useEffect(() => {
+    if (videoRef.current && streamRef.current && videoRef.current.srcObject !== streamRef.current) {
+      videoRef.current.setAttribute('playsinline', 'true');
+      videoRef.current.setAttribute('webkit-playsinline', 'true');
+      videoRef.current.muted = true;
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().then(() => {
+        setIsCameraReady(true);
+        setIsCameraLoading(false);
+      }).catch(() => {});
+    }
+  });
+
+  // Handle visibility change (e.g. mobile user switches apps or returns to Safari)
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && videoRef.current && streamRef.current) {
+        if (videoRef.current.paused) {
+          videoRef.current.play().catch(() => {});
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
+  // Toggle front/back camera with smooth transition feedback
   const toggleCamera = () => {
+    if (isFlipping || isCameraLoading) return;
+    setIsFlipping(true);
     setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user'));
+    setTimeout(() => {
+      setIsFlipping(false);
+    }, 450);
   };
 
   // Capture a single frame from the live video element
@@ -412,21 +510,52 @@ export default function PhotoboothStudio({
         <div className="lg:col-span-7 flex flex-col gap-4">
           {/* Live Camera Viewport */}
           <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-black shadow-2xl border-2 border-champagne-300/60 flex items-center justify-center group">
-            {isCameraActive ? (
-              <video
-                ref={videoRef}
-                playsInline
-                muted
-                autoPlay
-                className={`w-full h-full object-cover ${
-                  facingMode === 'user' ? 'scale-x-[-1]' : ''
-                }`}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center text-center p-6 text-warm-300">
+            {/* 1. Live Video Element: ALWAYS in DOM, never conditionally unmounted */}
+            <video
+              ref={videoRef}
+              playsInline
+              autoPlay
+              muted
+              onLoadedMetadata={() => {
+                if (videoRef.current) {
+                  videoRef.current.play().catch(() => {});
+                }
+                setIsCameraReady(true);
+                setIsCameraLoading(false);
+              }}
+              onPlaying={() => {
+                setIsCameraReady(true);
+                setIsCameraLoading(false);
+              }}
+              className={`w-full h-full object-cover transition-all duration-300 ${
+                facingMode === 'user' ? 'scale-x-[-1]' : ''
+              } ${isCameraReady ? 'opacity-100 scale-100' : 'opacity-0 scale-98'} ${
+                isFlipping ? 'opacity-30 blur-xs scale-95' : ''
+              }`}
+            />
+
+            {/* 2. Loading / Permission Wait State Overlay */}
+            {isCameraLoading && (
+              <div className="absolute inset-0 bg-neutral-900/90 backdrop-blur-xs flex flex-col items-center justify-center text-center p-6 text-warm-200 z-20 animate-fade-in">
+                <div className="relative mb-3.5">
+                  <div className="w-12 h-12 rounded-full border-2 border-champagne-400/30 border-t-champagne-400 animate-spin" />
+                  <Camera className="w-5 h-5 text-champagne-300 absolute inset-0 m-auto" />
+                </div>
+                <p className="font-serif italic text-base text-warm-100 mb-1">
+                  Menyambungkan Kamera...
+                </p>
+                <p className="text-xs text-warm-300/80 max-w-xs">
+                  Sila benarkan akses kamera pelayar anda untuk memulakan photobooth.
+                </p>
+              </div>
+            )}
+
+            {/* 3. Inactive or Error State Overlay */}
+            {!isCameraLoading && !isCameraActive && (
+              <div className="absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center text-center p-6 text-warm-300 z-20 animate-fade-in">
                 <Camera className="w-12 h-12 mb-3 text-champagne-400 opacity-60" />
                 <p className="font-serif italic text-base text-warm-100 mb-2">
-                  Kamera belum aktif
+                  Kamera Belum Aktif
                 </p>
                 {cameraError ? (
                   <p className="text-xs text-rose-300 max-w-xs mb-4">{cameraError}</p>
@@ -439,14 +568,14 @@ export default function PhotoboothStudio({
                   <button
                     type="button"
                     onClick={startCamera}
-                    className="px-4 py-2 rounded-xl bg-champagne-500 hover:bg-champagne-600 text-warm-950 font-semibold text-xs transition shadow-md"
+                    className="px-4 py-2 rounded-xl bg-champagne-500 hover:bg-champagne-600 text-warm-950 font-semibold text-xs transition shadow-md active:scale-95"
                   >
                     Hidupkan Kamera
                   </button>
                   <button
                     type="button"
                     onClick={() => fileUploadRef.current?.click()}
-                    className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white font-medium text-xs transition border border-white/30"
+                    className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white font-medium text-xs transition border border-white/30 active:scale-95"
                   >
                     Pilih Dari Galeri
                   </button>
@@ -454,7 +583,22 @@ export default function PhotoboothStudio({
               </div>
             )}
 
-            {/* Countdown Overlay Display */}
+            {/* 4. Top Live & Lens Status Badge */}
+            {isCameraActive && isCameraReady && (
+              <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10 animate-fade-in">
+                <div className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-[11px] font-medium text-warm-200 flex items-center gap-1.5 shadow-xs">
+                  <Camera className="w-3 h-3 text-champagne-400" />
+                  <span>{facingMode === 'user' ? 'Kamera Depan' : 'Kamera Belakang'}</span>
+                </div>
+
+                <div className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-[11px] font-medium text-emerald-300 flex items-center gap-1.5 shadow-xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Langsung</span>
+                </div>
+              </div>
+            )}
+
+            {/* 5. Countdown Overlay Display */}
             {countdown !== null && (
               <div className="absolute inset-0 bg-black/50 backdrop-blur-xs flex flex-col items-center justify-center text-white z-30 animate-fade-in gpu-layer">
                 <span className="font-serif text-8xl font-black text-champagne-300 drop-shadow-md gpu-layer scale-110 transition-transform duration-150">
@@ -466,7 +610,7 @@ export default function PhotoboothStudio({
               </div>
             )}
 
-            {/* Auto-shoot Banner notification */}
+            {/* 6. Auto-shoot Banner notification */}
             {isAutoShooting && autoShootMessage && (
               <div className="absolute top-4 left-4 right-4 z-20 px-4 py-2.5 rounded-2xl bg-black/80 backdrop-blur-xs sm:backdrop-blur-md text-white text-xs font-semibold flex items-center justify-between border border-champagne-400/40 shadow-lg animate-fade-down gpu-layer">
                 <span className="flex items-center gap-2">
@@ -479,24 +623,26 @@ export default function PhotoboothStudio({
               </div>
             )}
 
-            {/* Camera Floating Controls Overlay */}
+            {/* 7. Camera Floating Controls Overlay */}
             {isCameraActive && (
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10">
                 {/* Switch Front/Back Camera */}
                 <button
                   type="button"
                   onClick={toggleCamera}
-                  className="pointer-events-auto p-2.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-md transition active:scale-95"
+                  disabled={isFlipping || isCameraLoading}
+                  className="pointer-events-auto p-2.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-md transition-all active:scale-90 disabled:opacity-50 flex items-center gap-1.5"
                   title="Tukar Kamera Depan/Belakang"
                 >
-                  <SwitchCamera className="w-4 h-4" />
+                  <SwitchCamera className={`w-4 h-4 text-champagne-300 transition-transform duration-300 ${isFlipping ? 'rotate-180' : ''}`} />
+                  <span className="text-[11px] font-medium hidden sm:inline">Tukar Lensa</span>
                 </button>
 
                 {/* Upload single slot file */}
                 <button
                   type="button"
                   onClick={() => fileUploadRef.current?.click()}
-                  className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-xs font-medium border border-white/20 shadow-md transition"
+                  className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-xs font-medium border border-white/20 shadow-md transition active:scale-95"
                 >
                   <ImageIcon className="w-3.5 h-3.5 text-champagne-300" />
                   <span>Pilih Galeri</span>
@@ -510,7 +656,7 @@ export default function PhotoboothStudio({
             {/* Auto-Booth 4-Shots Button */}
             <button
               type="button"
-              disabled={isAutoShooting || !isCameraActive}
+              disabled={isAutoShooting || !isCameraReady}
               onClick={startAutoBooth}
               className="w-full sm:flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-champagne-500 via-champagne-400 to-champagne-500 hover:from-champagne-600 hover:to-champagne-500 text-warm-950 font-bold text-sm tracking-wide shadow-champagne transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
             >
@@ -525,9 +671,9 @@ export default function PhotoboothStudio({
             {/* Snap Single Shot Button */}
             <button
               type="button"
-              disabled={isAutoShooting || !isCameraActive}
+              disabled={isAutoShooting || !isCameraReady}
               onClick={() => runCountdownAndCapture(activeSlot)}
-              className="w-full sm:w-auto py-3.5 px-5 rounded-2xl bg-white hover:bg-warm-50 border border-warm-200 text-warm-800 font-semibold text-sm transition shadow-sm active:scale-95 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto py-3.5 px-5 rounded-2xl bg-white hover:bg-warm-50 border border-warm-200 text-warm-800 font-semibold text-sm transition shadow-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Camera className="w-4 h-4 text-champagne-600" />
               <span>Ambil Slot {activeSlot + 1}</span>
