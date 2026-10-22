@@ -44,7 +44,7 @@ export default function PhotoboothStudio({
   // State
   const [photos, setPhotos] = useState<string[]>([]);
   const [activeSlot, setActiveSlot] = useState<number>(0);
-  const [selectedTheme, setSelectedTheme] = useState<PhotoboothStripTheme['id']>('champagne-gold');
+  const [selectedTheme, setSelectedTheme] = useState<PhotoboothStripTheme['id']>('coquette-cherry');
   const [selectedFilter, setSelectedFilter] = useState<PhotoFilter['id']>('original');
   const [slotCount, setSlotCount] = useState<number>(4); // 4-cut or 3-cut
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
