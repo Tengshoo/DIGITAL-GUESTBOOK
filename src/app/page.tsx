@@ -308,14 +308,27 @@ export default function GuestbookPage() {
     PHOTO_FRAMES.find((f) => f.id === selectedFrame) || PHOTO_FRAMES[0];
 
   return (
-    <div className="relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-between overflow-x-hidden text-white select-none">
-      {/* 1. Full-Bleed Cinematic Background with GPU Compositing */}
+    <div className="relative w-full min-h-screen min-h-[100lvh] flex flex-col justify-between overflow-x-hidden text-white select-none bg-[#120F0D]">
+      {/* 1. Full-Bleed Cinematic Background - 100% Static During Mobile Scroll */}
       <div
-        className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none gpu-layer"
-        style={{ backgroundImage: `url(${eventDetails.bgImage})` }}
+        className="fixed top-[-2vh] left-0 w-full h-[104lvh] min-h-[104lvh] pointer-events-none overflow-hidden z-0 gpu-layer"
+        style={{
+          transform: 'translate3d(0, 0, 0)',
+          WebkitTransform: 'translate3d(0, 0, 0)',
+          willChange: 'transform',
+        }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={eventDetails.bgImage}
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover object-center select-none pointer-events-none"
+          loading="eager"
+          decoding="async"
+        />
         {/* Dark Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-black/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/80" />
       </div>
 
       {/* 2. Top Event Navigation Bar */}
