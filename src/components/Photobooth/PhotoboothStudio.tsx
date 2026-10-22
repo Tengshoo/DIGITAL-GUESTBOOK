@@ -40,7 +40,7 @@ export default function PhotoboothStudio({
     miniTitle: 'Majlis Pertunangan',
     date: '26 December 2026',
     venue: 'OneTwoKL',
-    hashtag: '#AtifIsma',
+    hashtag: '#AtifFoundIsma',
   },
   isModal = false,
 }: PhotoboothStudioProps) {

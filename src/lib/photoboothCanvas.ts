@@ -64,7 +64,7 @@ export async function generatePhotoboothStripCanvas(
     miniTitle: 'Majlis Pertunangan',
     date: '26 December 2026',
     venue: 'OneTwoKL',
-    hashtag: '#AtifIsma',
+    hashtag: '#AtifFoundIsma',
   }
 ): Promise<string> {
   // Ensure custom web fonts are loaded prior to canvas text rendering

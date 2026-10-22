@@ -16,7 +16,7 @@ export default function PhotoboothPage() {
     welcomeTitle: 'Atif & Isma',
     date: t.date,
     venue: 'OneTwoKL',
-    hashtag: '#AtifIsma',
+    hashtag: t.hashtag,
   };
 
   const handleAttachToGuestbook = (stripDataUrl: string) => {
