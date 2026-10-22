@@ -14,6 +14,8 @@ import {
   Calendar,
   MapPin,
   ChevronDown,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import Link from 'next/link';
 import VoiceRecorder from '@/components/VoiceRecorder';
@@ -60,6 +62,54 @@ export default function GuestbookPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Fullscreen toggle handler
+  const toggleFullscreen = () => {
+    if (typeof document === 'undefined') return;
+    const doc = document as unknown as {
+      fullscreenElement?: Element;
+      webkitFullscreenElement?: Element;
+      exitFullscreen?: () => Promise<void>;
+      webkitExitFullscreen?: () => Promise<void>;
+    };
+    const el = document.documentElement as unknown as {
+      requestFullscreen?: () => Promise<void>;
+      webkitRequestFullscreen?: () => Promise<void>;
+    };
+
+    if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(() => {});
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } else {
+      if (doc.exitFullscreen) {
+        doc.exitFullscreen().catch(() => {});
+      } else if (doc.webkitExitFullscreen) {
+        doc.webkitExitFullscreen();
+      }
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      const doc = document as unknown as {
+        fullscreenElement?: Element;
+        webkitFullscreenElement?: Element;
+      };
+      setIsFullscreen(Boolean(doc.fullscreenElement || doc.webkitFullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    document.addEventListener('webkitfullscreenchange', handleFsChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFsChange);
+      document.removeEventListener('webkitfullscreenchange', handleFsChange);
+    };
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
@@ -269,19 +319,41 @@ export default function GuestbookPage() {
       </div>
 
       {/* 2. Top Event Navigation Bar */}
-      <header className="relative z-10 w-full max-w-lg mx-auto pt-6 px-4 flex items-center justify-between">
+      <header className="relative z-10 w-full max-w-lg mx-auto safe-pt px-4 flex items-center justify-between">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-black/40 sm:bg-white/15 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-champagne-200 text-xs font-semibold tracking-wide shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-champagne-300" />
           <span>{eventDetails.hashtag}</span>
         </div>
 
-        <Link
-          href="/wall"
-          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs text-warm-200 transition-colors"
-        >
-          <Tv className="w-3.5 h-3.5 text-champagne-400" />
-          <span>Live Wall</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Fullscreen Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs text-warm-200 transition-colors"
+            title={isFullscreen ? 'Keluar Skrin Penuh' : 'Skrin Penuh (Fullscreen)'}
+          >
+            {isFullscreen ? (
+              <>
+                <Minimize2 className="w-3.5 h-3.5 text-champagne-300" />
+                <span className="hidden sm:inline">Keluar</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-3.5 h-3.5 text-champagne-300" />
+                <span className="hidden sm:inline">Skrin Penuh</span>
+              </>
+            )}
+          </button>
+
+          <Link
+            href="/wall"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs text-warm-200 transition-colors"
+          >
+            <Tv className="w-3.5 h-3.5 text-champagne-400" />
+            <span>Live Wall</span>
+          </Link>
+        </div>
       </header>
 
       {/* 3. Main Centered Cover Content */}
@@ -379,7 +451,7 @@ export default function GuestbookPage() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 w-full text-center py-4 text-[11px] text-white/50 backdrop-blur-xs sm:backdrop-blur-sm">
+      <footer className="relative z-10 w-full text-center py-4 safe-pb text-[11px] text-white/50 backdrop-blur-xs sm:backdrop-blur-sm">
         <p>memoira • {eventDetails.welcomeTitle} Celebration</p>
       </footer>
 

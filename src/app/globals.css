@@ -25,12 +25,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   min-height: 100dvh;
-  /* Support iPhone notch and bottom gesture bar */
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
+  margin: 0;
+  padding: 0;
+  width: 100%;
   position: relative;
+}
+
+/* Safe area padding utilities for true fullscreen */
+.safe-pt {
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+}
+.safe-pb {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
 }
 
 /* GPU-accelerated ambient backdrop without background-attachment: fixed mobile lag */

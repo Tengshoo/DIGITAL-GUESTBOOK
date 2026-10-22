@@ -14,10 +14,14 @@ export const metadata: Metadata = {
   title: 'Arman & Farah | Wedding Digital Guestbook & Live Wall',
   description:
     'Kongsi gambar, video, atau momen indah yang anda rakam bersama kami.',
+  manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'Arman & Farah',
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
   },
   icons: {
     icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💍</text></svg>',
