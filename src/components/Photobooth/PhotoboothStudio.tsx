@@ -44,10 +44,22 @@ export default function PhotoboothStudio({
   // State
   const [photos, setPhotos] = useState<string[]>([]);
   const [activeSlot, setActiveSlot] = useState<number>(0);
-  const [selectedTheme, setSelectedTheme] = useState<PhotoboothStripTheme['id']>('coquette-cherry');
+  const [selectedTheme, setSelectedTheme] = useState<PhotoboothStripTheme['id']>('floral-clip');
   const [selectedFilter, setSelectedFilter] = useState<PhotoFilter['id']>('original');
-  const [slotCount, setSlotCount] = useState<number>(4); // 4-cut or 3-cut
+  const [slotCount, setSlotCount] = useState<number>(3); // 3-cut or 4-cut matching template
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+
+  // Handle theme selection and automatically adapt slot count
+  const handleSelectTheme = (themeId: PhotoboothStripTheme['id']) => {
+    setSelectedTheme(themeId);
+    const theme = PHOTOBOOTH_STRIP_THEMES.find((t) => t.id === themeId);
+    if (theme) {
+      setSlotCount(theme.slotCount);
+      if (activeSlot >= theme.slotCount) {
+        setActiveSlot(theme.slotCount - 1);
+      }
+    }
+  };
 
   // Camera stream & recording
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -522,57 +534,50 @@ export default function PhotoboothStudio({
             </button>
           </div>
 
-          {/* Slot Count Toggle (3 Cuts vs 4 Cuts) */}
+          {/* Strip Info Bar */}
           <div className="flex items-center justify-between p-3 rounded-2xl bg-white/80 border border-warm-200/80 shadow-soft">
-            <span className="text-xs font-semibold text-warm-700">
-              Format Potongan Strip:
+            <span className="text-xs font-semibold text-warm-700 flex items-center gap-1.5">
+              <span>Format Strip Aktif:</span>
+              <span className="px-2 py-0.5 rounded-full bg-champagne-100 text-champagne-800 text-[11px] font-bold">
+                {slotCount} Cuts Layout
+              </span>
             </span>
-            <div className="flex items-center gap-1.5">
-              {[3, 4].map((count) => (
-                <button
-                  key={count}
-                  type="button"
-                  onClick={() => {
-                    setSlotCount(count);
-                    if (activeSlot >= count) setActiveSlot(count - 1);
-                  }}
-                  className={`px-3 py-1 rounded-xl text-xs font-semibold transition ${
-                    slotCount === count
-                      ? 'bg-champagne-600 text-white shadow-sm'
-                      : 'bg-warm-100 text-warm-600 hover:bg-warm-200'
-                  }`}
-                >
-                  {count} Cuts
-                </button>
-              ))}
-            </div>
+            <span className="text-[11px] font-mono text-warm-500">
+              {photos.filter(Boolean).length}/{slotCount} gambar
+            </span>
           </div>
 
-          {/* 5 Strip Themes Selection Bar */}
+          {/* Strip Themes Selection Bar (6 Choices from Authentic Reference) */}
           <div className="flex flex-col gap-2 pt-1">
             <div className="flex items-center justify-between text-xs text-warm-700">
               <span className="font-bold flex items-center gap-1.5">
                 <Wand2 className="w-3.5 h-3.5 text-champagne-600" />
-                <span>Pilih Gaya Strip Photobooth (5 Pilihan)</span>
+                <span>Pilih Koleksi Strip Photobooth (6 Pilihan)</span>
               </span>
-              <span className="text-[11px] text-warm-500">Sentuh untuk lihat</span>
+              <span className="text-[11px] text-warm-500">Sentuh untuk tukar</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {PHOTOBOOTH_STRIP_THEMES.map((theme) => {
                 const isSelected = selectedTheme === theme.id;
                 return (
                   <button
                     key={theme.id}
                     type="button"
-                    onClick={() => setSelectedTheme(theme.id)}
-                    className={`relative flex flex-col items-center justify-between p-2.5 rounded-2xl border text-center transition-all ${
+                    onClick={() => handleSelectTheme(theme.id)}
+                    className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border text-center transition-all ${
                       isSelected
-                        ? 'border-champagne-500 bg-champagne-50/90 shadow-champagne ring-2 ring-champagne-300 scale-[1.02]'
-                        : 'border-warm-200 bg-white/80 hover:bg-warm-50 hover:border-warm-300'
+                        ? 'border-champagne-500 bg-champagne-50/95 shadow-champagne ring-2 ring-champagne-300 scale-[1.02]'
+                        : 'border-warm-200 bg-white/90 hover:bg-warm-50 hover:border-warm-300'
                     }`}
                   >
-                    <span className="text-xl mb-1">{theme.icon}</span>
+                    <div className="flex items-center justify-between w-full mb-1">
+                      <span className="text-xl">{theme.icon}</span>
+                      <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-warm-100 text-warm-600 font-semibold">
+                        {theme.slotCount} Cuts
+                      </span>
+                    </div>
+
                     <span
                       className={`text-xs font-bold leading-tight ${
                         isSelected ? 'text-champagne-950' : 'text-warm-800'
@@ -580,12 +585,12 @@ export default function PhotoboothStudio({
                     >
                       {theme.name}
                     </span>
-                    <span className="text-[9px] text-warm-400 mt-0.5 line-clamp-1">
-                      {theme.subtitle}
+                    <span className="text-[9px] text-warm-500 mt-0.5 line-clamp-1">
+                      {theme.badge}
                     </span>
 
                     {isSelected && (
-                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-champagne-600 text-white flex items-center justify-center">
+                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-champagne-600 text-white flex items-center justify-center shadow-sm">
                         <Check className="w-2.5 h-2.5 stroke-[3]" />
                       </div>
                     )}
@@ -654,7 +659,6 @@ export default function PhotoboothStudio({
               onSelectSlot={(idx) => setActiveSlot(idx)}
               onClearSlot={(idx) => clearSlot(idx)}
               eventInfo={eventInfo}
-              totalSlots={slotCount}
             />
           </div>
 
