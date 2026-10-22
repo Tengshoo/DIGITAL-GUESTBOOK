@@ -307,43 +307,44 @@ export default function WallModePage() {
             </button>
           </div>
         ) : isGridView ? (
-          /* Event Gallery Grid Mode */
-          <div className="w-full max-h-[75vh] overflow-y-auto pr-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+          /* Event Gallery Grid Mode (2xN on mobile, 3xN on tablet, 4xN on desktop) */
+          <div className="w-full max-h-[78vh] overflow-y-auto pr-1 sm:pr-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 animate-fade-in">
             {entries.map((entry) => (
               <div
                 key={entry.id}
-                className="bg-white text-warm-900 p-5 rounded-2xl shadow-polaroid border border-champagne-200/50 flex flex-col justify-between transition-transform hover:scale-[1.02]"
+                className="bg-white text-warm-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl shadow-polaroid border border-champagne-200/50 flex flex-col justify-between transition-transform hover:scale-[1.02]"
               >
                 <div>
                   {entry.photo_url && (
-                    <div className="mb-4 rounded-xl overflow-hidden bg-warm-100/70 border border-warm-200/80 max-h-72 w-full flex items-center justify-center">
+                    <div className="mb-2.5 sm:mb-4 rounded-lg sm:rounded-xl overflow-hidden bg-warm-100/70 border border-warm-200/80 max-h-44 sm:max-h-72 w-full flex items-center justify-center">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={entry.photo_url}
                         alt={`Photo from ${entry.name}`}
-                        className="max-h-72 w-auto max-w-full object-contain rounded-lg"
+                        className="max-h-44 sm:max-h-72 w-auto max-w-full object-contain rounded-lg"
+                        loading="lazy"
                       />
                     </div>
                   )}
 
-                  <p className="font-serif italic text-base sm:text-lg text-warm-800 line-clamp-4 mb-3 leading-snug">
+                  <p className="font-serif italic text-xs sm:text-base text-warm-800 line-clamp-3 sm:line-clamp-4 mb-2 sm:mb-3 leading-snug">
                     &ldquo;{entry.message}&rdquo;
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-warm-100 flex items-center justify-between">
-                  <div>
-                    <h4 className="font-serif font-bold text-champagne-900 text-sm">
+                <div className="pt-2 sm:pt-3 border-t border-warm-100 flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-serif font-bold text-champagne-900 text-xs sm:text-sm truncate">
                       {entry.name}
                     </h4>
-                    <span className="text-[10px] text-warm-500">
+                    <span className="text-[9px] sm:text-[10px] text-warm-500 block truncate">
                       {formatTimestamp(entry.created_at)}
                     </span>
                   </div>
                 </div>
 
                 {entry.audio_url && (
-                  <div className="mt-3 pt-2">
+                  <div className="mt-2 sm:mt-3 pt-1.5 sm:pt-2">
                     <AudioPlayer src={entry.audio_url} compact />
                   </div>
                 )}
