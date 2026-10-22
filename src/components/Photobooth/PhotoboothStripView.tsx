@@ -32,7 +32,7 @@ export default function PhotoboothStripView({
   eventInfo = {
     welcomeTitle: 'Atif & Isma',
     miniTitle: 'Majlis Pertunangan',
-    date: '08 Jul 2026',
+    date: '26 December 2026',
     venue: 'OneTwoKL',
     hashtag: '#AtifIsma',
   },

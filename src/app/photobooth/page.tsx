@@ -14,7 +14,7 @@ export default function PhotoboothPage() {
   const eventDetails = {
     miniTitle: language === 'ms' ? 'Majlis Pertunangan' : 'Engagement Celebration',
     welcomeTitle: 'Atif & Isma',
-    date: '08 Jul 2026',
+    date: t.date,
     venue: 'OneTwoKL',
     hashtag: '#AtifIsma',
   };

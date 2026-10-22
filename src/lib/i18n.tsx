@@ -85,7 +85,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
 
     // Cover & Event
     miniTitle: 'Engagement Celebration',
-    date: '08 Jul 2026',
+    date: '26 December 2026',
     venue: 'OneTwoKL',
     hashtag: '#AtifIsma',
     welcomeMessage: 'Share your photos, videos, or heartfelt wishes captured with us today.',
@@ -156,7 +156,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
 
     // Cover & Event
     miniTitle: 'Majlis Pertunangan',
-    date: '08 Jul 2026',
+    date: '26 Disember 2026',
     venue: 'OneTwoKL',
     hashtag: '#AtifIsma',
     welcomeMessage: 'Kongsi gambar, video, atau momen indah yang anda rakam bersama kami.',
