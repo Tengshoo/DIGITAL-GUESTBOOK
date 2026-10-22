@@ -17,6 +17,9 @@ const nextConfig = {
   basePath: basePath,
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
+    NEXT_PUBLIC_GOOGLE_SCRIPT_URL:
+      process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
+      'https://script.google.com/macros/s/AKfycbxmqBSEM_3emvagMiClkb9yN1VNalC7joWLkYymvi8fk14xq1SexXeeIs2JS88zX27-/exec',
   },
   webpack: (config) => {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');

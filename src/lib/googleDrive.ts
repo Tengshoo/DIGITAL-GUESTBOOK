@@ -5,7 +5,9 @@
  * via a free, lightweight Google Apps Script Web App.
  */
 
-const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL || '';
+const GOOGLE_SCRIPT_URL =
+  process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
+  'https://script.google.com/macros/s/AKfycbxmqBSEM_3emvagMiClkb9yN1VNalC7joWLkYymvi8fk14xq1SexXeeIs2JS88zX27-/exec';
 const GOOGLE_DRIVE_FOLDER_URL = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_URL || '';
 
 export function isGoogleDriveConfigured(): boolean {
