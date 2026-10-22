@@ -33,12 +33,12 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* Safe area padding utilities for true fullscreen */
+/* Safe area padding utilities for iOS Notch / Dynamic Island & Home indicator */
 .safe-pt {
-  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  padding-top: max(1.25rem, env(safe-area-inset-top, 0px));
 }
 .safe-pb {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
 }
 
 /* GPU-accelerated ambient backdrop without background-attachment: fixed mobile lag */
@@ -58,9 +58,24 @@ body::before {
   -webkit-backface-visibility: hidden;
 }
 
-/* Responsive touch control: prevent 300ms double-tap zoom delay on buttons */
+/* Responsive touch control: prevent 300ms double-tap zoom delay across iOS and Android */
 button, a, input, textarea, select {
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent unwanted callout sheets and selection on decorative images */
+img, .no-callout {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Native momentum scrolling for mobile sheets and dialogs */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* GPU acceleration helper for 60fps / 120fps mobile sheets and modals */

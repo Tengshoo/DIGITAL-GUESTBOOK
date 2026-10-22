@@ -711,9 +711,9 @@ export default function PhotoboothStudio({
                     key={theme.id}
                     type="button"
                     onClick={() => handleSelectTheme(theme.id)}
-                    className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border text-center transition-all ${
+                    className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border text-center transition-colors active:scale-95 ${
                       isSelected
-                        ? 'border-champagne-500 bg-champagne-50/95 shadow-champagne ring-2 ring-champagne-300 scale-[1.02]'
+                        ? 'border-champagne-500 bg-champagne-50/95 shadow-champagne ring-2 ring-champagne-300'
                         : 'border-warm-200 bg-white/90 hover:bg-warm-50 hover:border-warm-300'
                     }`}
                   >

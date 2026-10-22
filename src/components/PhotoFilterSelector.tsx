@@ -119,7 +119,7 @@ export default function PhotoFilterSelector({
               type="button"
               disabled={disabled}
               onClick={() => onSelectFilter(filter.id)}
-              className={`relative flex flex-col items-center p-2 rounded-2xl border transition-colors duration-150 ${
+              className={`relative flex flex-col items-center p-2 rounded-2xl border transition-colors duration-150 active:scale-95 ${
                 isSelected
                   ? 'border-champagne-500 bg-champagne-50/90 shadow-champagne ring-2 ring-champagne-300'
                   : 'border-warm-200 bg-white/80 hover:bg-warm-50/90 hover:border-warm-300'

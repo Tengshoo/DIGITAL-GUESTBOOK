@@ -14,8 +14,6 @@ import {
   Calendar,
   MapPin,
   ChevronDown,
-  Maximize2,
-  Minimize2,
 } from 'lucide-react';
 import Link from 'next/link';
 import VoiceRecorder from '@/components/VoiceRecorder';
@@ -62,54 +60,18 @@ export default function GuestbookPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Fullscreen toggle handler
-  const toggleFullscreen = () => {
-    if (typeof document === 'undefined') return;
-    const doc = document as unknown as {
-      fullscreenElement?: Element;
-      webkitFullscreenElement?: Element;
-      exitFullscreen?: () => Promise<void>;
-      webkitExitFullscreen?: () => Promise<void>;
-    };
-    const el = document.documentElement as unknown as {
-      requestFullscreen?: () => Promise<void>;
-      webkitRequestFullscreen?: () => Promise<void>;
-    };
-
-    if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
-      if (el.requestFullscreen) {
-        el.requestFullscreen().catch(() => {});
-      } else if (el.webkitRequestFullscreen) {
-        el.webkitRequestFullscreen();
-      }
-      setIsFullscreen(true);
-    } else {
-      if (doc.exitFullscreen) {
-        doc.exitFullscreen().catch(() => {});
-      } else if (doc.webkitExitFullscreen) {
-        doc.webkitExitFullscreen();
-      }
-      setIsFullscreen(false);
-    }
-  };
-
+  // Close modals on Escape key press (Desktop / Hardware keyboard optimization)
   useEffect(() => {
-    const handleFsChange = () => {
-      const doc = document as unknown as {
-        fullscreenElement?: Element;
-        webkitFullscreenElement?: Element;
-      };
-      setIsFullscreen(Boolean(doc.fullscreenElement || doc.webkitFullscreenElement));
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isPhotoboothModalOpen) setIsPhotoboothModalOpen(false);
+        else if (isFormOpen) setIsFormOpen(false);
+      }
     };
-    document.addEventListener('fullscreenchange', handleFsChange);
-    document.addEventListener('webkitfullscreenchange', handleFsChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFsChange);
-      document.removeEventListener('webkitfullscreenchange', handleFsChange);
-    };
-  }, []);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFormOpen, isPhotoboothModalOpen]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
@@ -338,35 +300,13 @@ export default function GuestbookPage() {
           <span>{eventDetails.hashtag}</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Fullscreen Toggle Button */}
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs text-warm-200 transition-colors"
-            title={isFullscreen ? 'Keluar Skrin Penuh' : 'Skrin Penuh (Fullscreen)'}
-          >
-            {isFullscreen ? (
-              <>
-                <Minimize2 className="w-3.5 h-3.5 text-champagne-300" />
-                <span className="hidden sm:inline">Keluar</span>
-              </>
-            ) : (
-              <>
-                <Maximize2 className="w-3.5 h-3.5 text-champagne-300" />
-                <span className="hidden sm:inline">Skrin Penuh</span>
-              </>
-            )}
-          </button>
-
-          <Link
-            href="/wall"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs text-warm-200 transition-colors"
-          >
-            <Tv className="w-3.5 h-3.5 text-champagne-400" />
-            <span>Live Wall</span>
-          </Link>
-        </div>
+        <Link
+          href="/wall"
+          className="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs text-warm-200 transition-colors shadow-xs active:scale-95"
+        >
+          <Tv className="w-3.5 h-3.5 text-champagne-400" />
+          <span>Live Wall</span>
+        </Link>
       </header>
 
       {/* 3. Main Centered Cover Content */}
@@ -470,8 +410,13 @@ export default function GuestbookPage() {
 
       {/* 5. Interactive Submission Modal / Sheet */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 sm:bg-black/60 backdrop-blur-xs sm:backdrop-blur-sm animate-fade-in gpu-layer">
-          <div className="w-full max-w-lg max-h-[90dvh] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-[#FAF8F5] text-warm-900 rounded-t-3xl sm:rounded-3xl p-5 sm:p-8 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] shadow-2xl border-t sm:border border-champagne-300 relative animate-fade-up gpu-layer">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsFormOpen(false);
+          }}
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 sm:bg-black/60 backdrop-blur-xs sm:backdrop-blur-sm animate-fade-in gpu-layer cursor-pointer sm:cursor-default"
+        >
+          <div className="w-full max-w-lg max-h-[90dvh] overflow-y-auto overscroll-contain touch-scroll bg-[#FAF8F5] text-warm-900 rounded-t-3xl sm:rounded-3xl p-5 sm:p-8 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] shadow-2xl border-t sm:border border-champagne-300 relative animate-fade-up gpu-layer cursor-default">
             {/* Mobile bottom-sheet drag handle */}
             <div className="w-12 h-1.5 bg-warm-300 rounded-full mx-auto -mt-1 mb-3.5 sm:hidden" />
 
@@ -733,8 +678,13 @@ export default function GuestbookPage() {
 
       {/* 6. In-Page Photobooth Studio Modal */}
       {isPhotoboothModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-4xl max-h-[94dvh] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-[#FAF8F5] rounded-3xl p-4 sm:p-7 shadow-2xl border border-champagne-300 relative">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsPhotoboothModalOpen(false);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-xs sm:backdrop-blur-sm animate-fade-in cursor-pointer sm:cursor-default"
+        >
+          <div className="w-full max-w-4xl max-h-[94dvh] overflow-y-auto overscroll-contain touch-scroll bg-[#FAF8F5] rounded-3xl p-4 sm:p-7 shadow-2xl border border-champagne-300 relative cursor-default">
             <PhotoboothStudio
               eventInfo={eventDetails}
               onClose={() => setIsPhotoboothModalOpen(false)}

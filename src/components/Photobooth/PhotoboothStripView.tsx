@@ -103,16 +103,20 @@ export default function PhotoboothStripView({
                     }}
                   />
 
-                  {/* Slot Hover Overlay / Clear button */}
+                  {/* Slot Hover & Active Touch Overlay / Clear button */}
                   {onClearSlot && (
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center gap-2">
+                    <div
+                      className={`absolute inset-0 bg-black/45 transition-opacity duration-150 flex items-center justify-center gap-2 ${
+                        isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                      }`}
+                    >
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           onClearSlot(index);
                         }}
-                        className="p-1.5 rounded-full bg-white/90 text-rose-600 hover:bg-white shadow-md transition-transform duration-100 active:scale-90"
+                        className="p-1.5 rounded-full bg-white/95 text-rose-600 hover:bg-white shadow-md transition-transform duration-100 active:scale-90"
                         title="Padam & Ambil Semula"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
