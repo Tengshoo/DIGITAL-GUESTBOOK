@@ -16,10 +16,12 @@ import {
   Wand2,
   Play,
   X,
+  Smartphone,
 } from 'lucide-react';
 import { PHOTOBOOTH_STRIP_THEMES, PhotoboothStripTheme } from './stripThemes';
 import PhotoboothStripView from './PhotoboothStripView';
 import { generatePhotoboothStripCanvas, downloadStripImage, EventInfo } from '@/lib/photoboothCanvas';
+import { uploadPhotoToGoogleDrive } from '@/lib/googleDrive';
 import { PHOTO_FILTERS, PhotoFilter } from '@/components/PhotoFilterSelector';
 import { useLanguage } from '@/lib/i18n';
 
@@ -51,6 +53,11 @@ export default function PhotoboothStudio({
   const [selectedFilter, setSelectedFilter] = useState<PhotoFilter['id']>('original');
   const [slotCount, setSlotCount] = useState<number>(3); // 3-cut or 4-cut matching template
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+  const [savedStripModal, setSavedStripModal] = useState<{
+    dataUrl: string;
+    blobUrl?: string;
+    filename: string;
+  } | null>(null);
 
   // Handle theme selection and automatically adapt slot count
   const handleSelectTheme = (themeId: PhotoboothStripTheme['id']) => {
@@ -420,7 +427,23 @@ export default function PhotoboothStudio({
       );
 
       const filename = `${eventInfo.welcomeTitle.replace(/\s+/g, '_')}_Photobooth_Strip.jpg`;
-      downloadStripImage(dataUrl, filename);
+
+      // Auto backup to Google Drive in the background
+      uploadPhotoToGoogleDrive({
+        photoBase64: dataUrl,
+        guestName: 'Photobooth',
+        filename: filename,
+      }).catch((err) => console.warn('Google Drive photobooth backup:', err));
+
+      // Trigger native share sheet or direct download
+      const result = await downloadStripImage(dataUrl, filename);
+
+      // Open mobile save preview sheet
+      setSavedStripModal({
+        dataUrl,
+        blobUrl: result.blobUrl || dataUrl,
+        filename,
+      });
 
       confetti({
         particleCount: 100,
@@ -850,6 +873,94 @@ export default function PhotoboothStudio({
           </div>
         </div>
       </div>
+
+      {/* Mobile Save / Download Confirmation Modal */}
+      {savedStripModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-sm max-h-[90vh] bg-white rounded-3xl shadow-2xl p-5 flex flex-col items-center overflow-y-auto border border-warm-200">
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setSavedStripModal(null)}
+              className="absolute top-3.5 right-3.5 p-2 rounded-full bg-warm-100 hover:bg-warm-200 text-warm-600 transition"
+              title="Tutup"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Header */}
+            <div className="text-center mb-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-champagne-100 text-champagne-900 text-[11px] font-bold mb-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-champagne-600" />
+                <span>{language === 'ms' ? 'Strip Gambar HD Sedia!' : 'HD Strip Ready!'}</span>
+              </span>
+              <h3 className="font-serif text-lg font-bold text-warm-900">
+                {language === 'ms' ? 'Simpan Photobooth Strip' : 'Save Your Photobooth Strip'}
+              </h3>
+            </div>
+
+            {/* Strip Preview */}
+            <div className="relative w-full max-w-[210px] my-2 rounded-xl overflow-hidden shadow-lg border border-warm-200/80 bg-warm-50 flex justify-center">
+              <img
+                src={savedStripModal.blobUrl || savedStripModal.dataUrl}
+                alt="Photobooth Strip"
+                className="w-full h-auto object-contain select-auto pointer-events-auto"
+              />
+            </div>
+
+            {/* Mobile Long-Press Instruction Card */}
+            <div className="w-full p-2.5 my-2 rounded-2xl bg-champagne-50/90 border border-champagne-200 text-left flex items-start gap-2.5">
+              <Smartphone className="w-4 h-4 text-champagne-700 shrink-0 mt-0.5" />
+              <p className="text-[11px] text-warm-700 leading-snug">
+                {language === 'ms' ? (
+                  <>
+                    <strong className="text-champagne-950">Tip Simpan Telefon:</strong> Tekan dan tahan (long-press) gambar di atas, kemudian pilih <em>'Simpan Imej' (Save to Photos)</em>.
+                  </>
+                ) : (
+                  <>
+                    <strong className="text-champagne-950">Mobile Tip:</strong> Tap and hold the image above, then select <em>'Save to Photos'</em>.
+                  </>
+                )}
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="w-full flex flex-col gap-2 mt-2">
+              <button
+                type="button"
+                onClick={() => downloadStripImage(savedStripModal.dataUrl, savedStripModal.filename)}
+                className="w-full py-3 px-4 rounded-xl bg-champagne-600 hover:bg-champagne-700 text-white font-semibold text-xs transition shadow-md active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{language === 'ms' ? 'Muat Turun / Kongsi Semula' : 'Download / Share Again'}</span>
+              </button>
+
+              {onAttachToGuestbook && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const dataUrl = savedStripModal.dataUrl;
+                    setSavedStripModal(null);
+                    onAttachToGuestbook(dataUrl);
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-warm-100 border border-warm-200 text-warm-900 font-semibold text-xs transition active:scale-95 flex items-center justify-center gap-1.5"
+                >
+                  <Heart className="w-3.5 h-3.5 text-rose-500 fill-current" />
+                  <span>{t.attachToGuestbook}</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setSavedStripModal(null)}
+                className="w-full py-1.5 text-warm-500 hover:text-warm-800 text-xs font-medium transition"
+              >
+                {language === 'ms' ? 'Tutup' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

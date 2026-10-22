@@ -236,13 +236,71 @@ export async function generatePhotoboothStripCanvas(
 }
 
 /**
- * Triggers a direct download of the data URL to the user's device
+ * Converts a base64 Data URL to a Blob
  */
-export function downloadStripImage(dataUrl: string, filename: string = 'photobooth_strip.jpg') {
-  const link = document.createElement('a');
-  link.download = filename;
-  link.href = dataUrl;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+export async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
+  const res = await fetch(dataUrl);
+  return await res.blob();
+}
+
+/**
+ * Triggers a direct download or native share sheet of the photobooth strip to the user's device.
+ * Fully compatible with iOS Safari, Android Chrome, and Desktop browsers.
+ */
+export async function downloadStripImage(
+  dataUrl: string,
+  filename: string = 'photobooth_strip.jpg'
+): Promise<{ success: boolean; method: 'share' | 'download' | 'fallback'; blobUrl?: string }> {
+  try {
+    const blob = await dataUrlToBlob(dataUrl);
+    const blobUrl = URL.createObjectURL(blob);
+
+    // 1. Try Native Web Share API (Best experience on iOS Safari and Android devices)
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        const file = new File([blob], filename, { type: 'image/jpeg' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: filename,
+            text: 'Atif & Isma Photobooth Strip ♡',
+          });
+          return { success: true, method: 'share', blobUrl };
+        }
+      } catch (shareErr) {
+        // User aborted the share dialog; treat as completed
+        if (shareErr instanceof Error && shareErr.name === 'AbortError') {
+          return { success: true, method: 'share', blobUrl };
+        }
+        console.warn('Native Web Share failed, attempting direct download:', shareErr);
+      }
+    }
+
+    // 2. Standard Anchor download (Desktop and Android Chrome)
+    const isIOS =
+      typeof navigator !== 'undefined' &&
+      (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+
+    if (!isIOS) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = blobUrl;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        if (document.body.contains(link)) {
+          document.body.removeChild(link);
+        }
+      }, 1000);
+      return { success: true, method: 'download', blobUrl };
+    }
+
+    // 3. iOS Safari Fallback: Return blobUrl for the preview modal so user can long-press to save
+    return { success: true, method: 'fallback', blobUrl };
+  } catch (err) {
+    console.error('Failed to initiate strip download:', err);
+    return { success: false, method: 'fallback' };
+  }
 }
