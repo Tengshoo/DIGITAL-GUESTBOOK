@@ -402,9 +402,9 @@ export default function PhotoFrameSelector({
               type="button"
               disabled={disabled}
               onClick={() => onSelectFrame(frame.id)}
-              className={`relative flex flex-col items-center justify-between p-2 rounded-xl border transition-all text-center min-h-[70px] ${
+              className={`relative flex flex-col items-center justify-between p-2 rounded-xl border transition-colors duration-150 text-center min-h-[70px] ${
                 isSelected
-                  ? 'border-champagne-500 bg-champagne-50/90 shadow-champagne ring-2 ring-champagne-300 scale-[1.02]'
+                  ? 'border-champagne-500 bg-champagne-50/90 shadow-champagne ring-2 ring-champagne-300'
                   : 'border-warm-200 bg-white/70 hover:bg-warm-50/80 hover:border-warm-300'
               }`}
             >

@@ -19,15 +19,10 @@ html {
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(247, 240, 223, 0.4) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(253, 236, 238, 0.35) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(244, 236, 225, 0.3) 0px, transparent 50%);
-  background-attachment: fixed;
   min-height: 100vh;
   min-height: 100dvh;
   /* Support iPhone notch and bottom gesture bar */
@@ -35,11 +30,38 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
+  position: relative;
+}
+
+/* GPU-accelerated ambient backdrop without background-attachment: fixed mobile lag */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(247, 240, 223, 0.4) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(253, 236, 238, 0.35) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(244, 236, 225, 0.3) 0px, transparent 50%);
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Responsive touch control: prevent 300ms double-tap zoom delay on buttons */
 button, a, input, textarea, select {
   touch-action: manipulation;
+}
+
+/* GPU acceleration helper for 60fps / 120fps mobile sheets and modals */
+.gpu-layer {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 /* Custom scrollbars */

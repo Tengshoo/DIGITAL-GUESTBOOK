@@ -46,7 +46,7 @@ export default function PhotoboothStripView({
 
   return (
     <div
-      className={`relative mx-auto rounded-2xl shadow-2xl overflow-hidden select-none transition-all duration-300 border border-warm-300/40 ${
+      className={`relative mx-auto rounded-2xl shadow-xl overflow-hidden select-none gpu-layer border border-warm-300/40 ${
         compact
           ? 'w-full max-w-[240px]'
           : 'w-full max-w-[280px] xs:max-w-[300px] sm:max-w-[320px]'
@@ -87,7 +87,7 @@ export default function PhotoboothStripView({
               transformOrigin: 'center center',
               zIndex: 5 + index,
             }}
-            className={`absolute cursor-pointer group transition-transform ${
+            className={`absolute cursor-pointer group transition-transform duration-150 gpu-layer ${
               isActive ? 'ring-2 ring-champagne-400 ring-offset-2 scale-[1.01]' : ''
             }`}
           >
@@ -97,7 +97,7 @@ export default function PhotoboothStripView({
                   <img
                     src={photo}
                     alt={`Slot ${index + 1}`}
-                    className="w-full h-full object-cover transition duration-200"
+                    className="w-full h-full object-cover transition-opacity duration-150"
                     style={{
                       filter: currentFilter?.cssFilter || 'none',
                     }}
@@ -105,14 +105,14 @@ export default function PhotoboothStripView({
 
                   {/* Slot Hover Overlay / Clear button */}
                   {onClearSlot && (
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center gap-2">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           onClearSlot(index);
                         }}
-                        className="p-1.5 rounded-full bg-white/90 text-rose-600 hover:bg-white shadow-md transition active:scale-90"
+                        className="p-1.5 rounded-full bg-white/90 text-rose-600 hover:bg-white shadow-md transition-transform duration-100 active:scale-90"
                         title="Padam & Ambil Semula"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
@@ -121,23 +121,23 @@ export default function PhotoboothStripView({
                   )}
 
                   {/* Slot badge indicator */}
-                  <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md bg-black/50 backdrop-blur-sm text-[8px] font-mono text-white/90 opacity-60 group-hover:opacity-100 transition">
+                  <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md bg-black/50 backdrop-blur-xs text-[8px] font-mono text-white/90 opacity-60 group-hover:opacity-100 transition-opacity">
                     #{index + 1}
                   </div>
                 </>
               ) : (
                 /* Empty Slot Placeholder */
                 <div
-                  className={`w-full h-full flex flex-col items-center justify-center p-2 text-center transition-all ${
+                  className={`w-full h-full flex flex-col items-center justify-center p-2 text-center transition-colors duration-150 ${
                     isActive
-                      ? 'bg-champagne-100/90 text-champagne-900 border-2 border-dashed border-champagne-500'
-                      : 'bg-warm-100/70 text-warm-500 hover:bg-warm-100 border border-dashed border-warm-300'
+                      ? 'bg-champagne-100/95 text-champagne-900 border-2 border-dashed border-champagne-500'
+                      : 'bg-warm-100/75 text-warm-500 hover:bg-warm-100 border border-dashed border-warm-300'
                   }`}
                 >
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center mb-1 transition ${
+                    className={`w-7 h-7 rounded-full flex items-center justify-center mb-1 transition-transform duration-150 ${
                       isActive
-                        ? 'bg-champagne-500 text-white shadow-md animate-bounce'
+                        ? 'bg-champagne-500 text-white shadow-md ring-2 ring-champagne-300 scale-105'
                         : 'bg-warm-200/80 text-warm-600 group-hover:scale-110'
                     }`}
                   >

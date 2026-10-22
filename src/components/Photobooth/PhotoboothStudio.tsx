@@ -361,7 +361,7 @@ export default function PhotoboothStudio({
     <div className="w-full flex flex-col items-center animate-fade-in relative">
       {/* Screen flash effect */}
       {isFlashing && (
-        <div className="fixed inset-0 z-50 bg-white pointer-events-none animate-ping" />
+        <div className="fixed inset-0 z-50 bg-white/95 pointer-events-none transition-opacity duration-150 gpu-layer" />
       )}
 
       {/* Hidden file input */}
@@ -456,8 +456,8 @@ export default function PhotoboothStudio({
 
             {/* Countdown Overlay Display */}
             {countdown !== null && (
-              <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center text-white z-30 animate-fade-in">
-                <span className="font-serif text-8xl font-black drop-shadow-lg text-champagne-300 scale-125 transition-transform animate-ping">
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-xs flex flex-col items-center justify-center text-white z-30 animate-fade-in gpu-layer">
+                <span className="font-serif text-8xl font-black text-champagne-300 drop-shadow-md gpu-layer scale-110 transition-transform duration-150">
                   {countdown}
                 </span>
                 <span className="text-sm font-sans tracking-widest uppercase font-semibold text-warm-200 mt-4">
@@ -468,7 +468,7 @@ export default function PhotoboothStudio({
 
             {/* Auto-shoot Banner notification */}
             {isAutoShooting && autoShootMessage && (
-              <div className="absolute top-4 left-4 right-4 z-20 px-4 py-2.5 rounded-2xl bg-black/75 backdrop-blur-md text-white text-xs font-semibold flex items-center justify-between border border-champagne-400/40 shadow-lg animate-fade-down">
+              <div className="absolute top-4 left-4 right-4 z-20 px-4 py-2.5 rounded-2xl bg-black/80 backdrop-blur-xs sm:backdrop-blur-md text-white text-xs font-semibold flex items-center justify-between border border-champagne-400/40 shadow-lg animate-fade-down gpu-layer">
                 <span className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
                   <span>{autoShootMessage}</span>

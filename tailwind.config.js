@@ -55,8 +55,9 @@ module.exports = {
         soft: '0 4px 20px -2px rgba(90, 68, 48, 0.06), 0 2px 6px -1px rgba(90, 68, 48, 0.04)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'fade-up': 'fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in': 'fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-up': 'fadeUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-down': 'fadeDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'float-gentle': 'floatGentle 6s ease-in-out infinite',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
@@ -66,12 +67,16 @@ module.exports = {
           '100%': { opacity: '1' },
         },
         fadeUp: {
-          '0%': { opacity: '0', transform: 'translateY(16px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          '0%': { opacity: '0', transform: 'translate3d(0, 14px, 0)' },
+          '100%': { opacity: '1', transform: 'translate3d(0, 0, 0)' },
+        },
+        fadeDown: {
+          '0%': { opacity: '0', transform: 'translate3d(0, -10px, 0)' },
+          '100%': { opacity: '1', transform: 'translate3d(0, 0, 0)' },
         },
         floatGentle: {
-          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-          '50%': { transform: 'translateY(-6px) rotate(0.5deg)' },
+          '0%, 100%': { transform: 'translate3d(0, 0px, 0)' },
+          '50%': { transform: 'translate3d(0, -5px, 0)' },
         },
       },
     },

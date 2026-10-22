@@ -259,9 +259,9 @@ export default function GuestbookPage() {
 
   return (
     <div className="relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-between overflow-x-hidden text-white select-none">
-      {/* 1. Full-Bleed Cinematic Background */}
+      {/* 1. Full-Bleed Cinematic Background with GPU Compositing */}
       <div
-        className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105 pointer-events-none"
+        className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none gpu-layer"
         style={{ backgroundImage: `url(${eventDetails.bgImage})` }}
       >
         {/* Dark Vignette Overlay */}
@@ -270,14 +270,14 @@ export default function GuestbookPage() {
 
       {/* 2. Top Event Navigation Bar */}
       <header className="relative z-10 w-full max-w-lg mx-auto pt-6 px-4 flex items-center justify-between">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-champagne-200 text-xs font-semibold tracking-wide shadow-sm">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-black/40 sm:bg-white/15 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-champagne-200 text-xs font-semibold tracking-wide shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-champagne-300" />
           <span>{eventDetails.hashtag}</span>
         </div>
 
         <Link
           href="/wall"
-          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-xs text-warm-200 transition"
+          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs text-warm-200 transition-colors"
         >
           <Tv className="w-3.5 h-3.5 text-champagne-400" />
           <span>Live Wall</span>
@@ -285,10 +285,10 @@ export default function GuestbookPage() {
       </header>
 
       {/* 3. Main Centered Cover Content */}
-      <main className="relative z-10 w-full max-w-md mx-auto px-5 py-8 my-auto flex flex-col items-center text-center animate-fade-in">
+      <main className="relative z-10 w-full max-w-md mx-auto px-5 py-8 my-auto flex flex-col items-center text-center animate-fade-in gpu-layer">
         {/* Couple Circular Avatar */}
         <div className="relative mb-5 group">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white/90 shadow-[0_15px_35px_rgba(0,0,0,0.5)] ring-4 ring-champagne-400/40 transition-transform duration-500 group-hover:scale-105 bg-warm-200">
+          <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white/90 shadow-[0_15px_35px_rgba(0,0,0,0.5)] ring-4 ring-champagne-400/40 transition-transform duration-300 group-hover:scale-105 bg-warm-200 gpu-layer">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={eventDetails.avatarImage}
@@ -312,7 +312,7 @@ export default function GuestbookPage() {
         </h1>
 
         {/* Event Metadata (Date & Venue) */}
-        <div className="inline-flex flex-wrap items-center justify-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm text-warm-100 shadow-sm mb-6">
+        <div className="inline-flex flex-wrap items-center justify-center gap-2.5 px-4 py-2 rounded-full bg-black/40 sm:bg-white/10 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs sm:text-sm text-warm-100 shadow-sm mb-6">
           <span className="flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-champagne-300" />
             <span>{eventDetails.date}</span>
@@ -330,7 +330,7 @@ export default function GuestbookPage() {
         </p>
 
         {/* 4. Guest Entry Box */}
-        <div className="w-full bg-black/40 backdrop-blur-xl p-5 sm:p-6 rounded-3xl border border-white/20 shadow-2xl flex flex-col gap-3.5">
+        <div className="w-full bg-black/60 sm:bg-black/40 backdrop-blur-sm sm:backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-white/20 shadow-2xl flex flex-col gap-3.5 gpu-layer">
           <div className="flex flex-col gap-1.5 text-left">
             <label
               htmlFor="guest-name-cover"
@@ -344,7 +344,7 @@ export default function GuestbookPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Masukkan nama anda..."
-              className="w-full px-4 py-3.5 rounded-2xl border border-white/25 bg-white/10 text-white placeholder-white/50 text-center text-[16px] sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-champagne-400 focus:bg-black/40 transition"
+              className="w-full px-4 py-3.5 rounded-2xl border border-white/25 bg-white/10 text-white placeholder-white/50 text-center text-[16px] sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-champagne-400 focus:bg-black/40 transition-colors"
             />
           </div>
 
@@ -352,25 +352,25 @@ export default function GuestbookPage() {
           <button
             type="button"
             onClick={openFormWithName}
-            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-champagne-500 via-champagne-400 to-champagne-500 hover:from-champagne-600 hover:to-champagne-500 text-warm-950 font-bold text-sm tracking-wide shadow-champagne transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-champagne-500 via-champagne-400 to-champagne-500 hover:from-champagne-600 hover:to-champagne-500 text-warm-950 font-bold text-sm tracking-wide shadow-champagne transition-transform duration-150 active:scale-[0.98] flex items-center justify-center gap-2 gpu-layer"
           >
             <Camera className="w-4 h-4 fill-warm-950" />
             <span>Kongsikan Momen</span>
           </button>
 
-          {/* Photobooth Studio Action: "📸 Studio Photobooth (5 Gaya Strip)" */}
+          {/* Photobooth Studio Action: "📸 Studio Photobooth (6 Pilihan Strip)" */}
           <Link
             href="/photobooth"
-            className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-champagne-800/80 via-warm-900/90 to-amber-900/80 hover:from-champagne-800 hover:to-amber-900 border border-champagne-400/40 text-white font-bold text-xs tracking-wide shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 group backdrop-blur-sm"
+            className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-champagne-800/80 via-warm-900/90 to-amber-900/80 hover:from-champagne-800 hover:to-amber-900 border border-champagne-400/40 text-white font-bold text-xs tracking-wide shadow-lg transition-transform duration-150 active:scale-[0.98] flex items-center justify-center gap-2 group backdrop-blur-xs sm:backdrop-blur-sm gpu-layer"
           >
-            <Sparkles className="w-4 h-4 text-champagne-300 group-hover:rotate-12 transition-transform" />
-            <span>📸 Studio Photobooth (5 Pilihan Strip)</span>
+            <Sparkles className="w-4 h-4 text-champagne-300 group-hover:rotate-12 transition-transform duration-200" />
+            <span>📸 Studio Photobooth (6 Pilihan Strip)</span>
           </Link>
 
           {/* Secondary Action: "Buka Galeri & Live Wall" */}
           <Link
             href="/wall"
-            className="w-full py-3 px-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium text-xs transition flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium text-xs transition-colors flex items-center justify-center gap-2"
           >
             <Tv className="w-3.5 h-3.5 text-champagne-300" />
             <span>Buka Galeri & Live Wall</span>
@@ -379,14 +379,14 @@ export default function GuestbookPage() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 w-full text-center py-4 text-[11px] text-white/50 backdrop-blur-sm">
+      <footer className="relative z-10 w-full text-center py-4 text-[11px] text-white/50 backdrop-blur-xs sm:backdrop-blur-sm">
         <p>memoira • {eventDetails.welcomeTitle} Celebration</p>
       </footer>
 
       {/* 5. Interactive Submission Modal / Sheet */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-lg max-h-[90dvh] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-[#FAF8F5] text-warm-900 rounded-t-3xl sm:rounded-3xl p-5 sm:p-8 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] shadow-2xl border-t sm:border border-champagne-300 relative animate-fade-up">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 sm:bg-black/60 backdrop-blur-xs sm:backdrop-blur-sm animate-fade-in gpu-layer">
+          <div className="w-full max-w-lg max-h-[90dvh] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-[#FAF8F5] text-warm-900 rounded-t-3xl sm:rounded-3xl p-5 sm:p-8 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] shadow-2xl border-t sm:border border-champagne-300 relative animate-fade-up gpu-layer">
             {/* Mobile bottom-sheet drag handle */}
             <div className="w-12 h-1.5 bg-warm-300 rounded-full mx-auto -mt-1 mb-3.5 sm:hidden" />
 
@@ -626,7 +626,7 @@ export default function GuestbookPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-champagne-600 via-champagne-500 to-champagne-600 hover:from-champagne-700 hover:to-champagne-600 text-white font-medium text-sm tracking-wide shadow-champagne transition-all active:scale-[0.99] disabled:opacity-70 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-champagne-600 via-champagne-500 to-champagne-600 hover:from-champagne-700 hover:to-champagne-600 text-white font-medium text-sm tracking-wide shadow-champagne transition-transform duration-150 active:scale-[0.99] disabled:opacity-70 flex items-center justify-center gap-2 gpu-layer"
                 >
                   {isSubmitting ? (
                     <>
