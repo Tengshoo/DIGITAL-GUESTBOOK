@@ -54,6 +54,7 @@ export default function PhotoboothStripView({
       style={{
         aspectRatio: `${width} / ${height}`,
         backgroundColor: currentTheme.bgColor,
+        containerType: 'inline-size',
       }}
     >
       {/* 1. Authentic Template Artwork Background */}
@@ -247,13 +248,6 @@ export default function PhotoboothStripView({
           </div>
         );
       })}
-
-      {/* 5. Signature Subtitle Touch (Bottom subtle footer watermark) */}
-      <div className="absolute bottom-1.5 inset-x-0 text-center pointer-events-none z-20">
-        <span className="text-[7px] tracking-widest uppercase opacity-40 font-mono text-warm-700">
-          {eventInfo.hashtag} • {eventInfo.venue}
-        </span>
-      </div>
     </div>
   );
 }

@@ -232,18 +232,6 @@ export async function generatePhotoboothStripCanvas(
     }
   }
 
-  // 6. Draw Subtle Bottom Watermark
-  ctx.save();
-  ctx.font = '500 14px monospace';
-  ctx.fillStyle = 'rgba(120, 100, 90, 0.45)';
-  ctx.textAlign = 'center';
-  ctx.fillText(
-    `${eventInfo.hashtag} • ${eventInfo.venue} • 08.07.2026`,
-    theme.width / 2,
-    theme.height - 18
-  );
-  ctx.restore();
-
   return canvas.toDataURL('image/jpeg', 0.94);
 }
 
