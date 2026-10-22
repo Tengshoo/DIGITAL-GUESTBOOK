@@ -49,8 +49,8 @@ create policy "Allow deletions for moderation"
   for delete
   using (true);
 
--- 5. Insert welcome sample memories for Arman & Farah
+-- 5. Insert welcome sample memories for Atif & Isma
 insert into public.entries (name, message, is_approved)
 values
-  ('Harith & Sarah', 'Barakallahu lakuma wa baraka alaikuma wa jamaa bainakuma fi khair! Semoga mahligai yang dibina kekal hingga ke jannah. Selamat pengantin baru Arman & Farah!', 1),
-  ('Family Pak Ngah', 'Tahniah Arman & Farah! Sama cantik sama padan. Moga dikurniakan zuriat yang soleh dan solehah serta kebahagiaan berpanjangan.', 1);
+  ('Harith & Sarah', 'Barakallahu lakuma wa baraka alaikuma wa jamaa bainakuma fi khair! Semoga mahligai yang dibina kekal hingga ke jannah. Selamat pengantin baru Atif & Isma!', 1),
+  ('Family Pak Ngah', 'Tahniah Atif & Isma! Sama cantik sama padan. Moga dikurniakan zuriat yang soleh dan solehah serta kebahagiaan berpanjangan.', 1);

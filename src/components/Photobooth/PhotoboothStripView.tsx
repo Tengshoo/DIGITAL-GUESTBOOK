@@ -30,11 +30,11 @@ export default function PhotoboothStripView({
   onSelectSlot,
   onClearSlot,
   eventInfo = {
-    welcomeTitle: 'Arman & Farah',
+    welcomeTitle: 'Atif & Isma',
     miniTitle: 'Majlis Perkahwinan',
     date: '08 Jul 2026',
-    venue: 'Hotel memoira',
-    hashtag: '#ArmanFarah',
+    venue: 'OneTwoKL',
+    hashtag: '#AtifIsma',
   },
   compact = false,
 }: PhotoboothStripViewProps) {
@@ -251,7 +251,7 @@ export default function PhotoboothStripView({
       {/* 5. Signature Subtitle Touch (Bottom subtle footer watermark) */}
       <div className="absolute bottom-1.5 inset-x-0 text-center pointer-events-none z-20">
         <span className="text-[7px] tracking-widest uppercase opacity-40 font-mono text-warm-700">
-          #ArmanFarah • Hotel memoira
+          {eventInfo.hashtag} • {eventInfo.venue}
         </span>
       </div>
     </div>

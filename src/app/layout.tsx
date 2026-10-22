@@ -11,14 +11,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Arman & Farah | Wedding Digital Guestbook & Live Wall',
+  title: 'Atif & Isma | Wedding Digital Guestbook & Live Wall',
   description:
     'Kongsi gambar, video, atau momen indah yang anda rakam bersama kami.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Arman & Farah',
+    title: 'Atif & Isma',
   },
   other: {
     'mobile-web-app-capable': 'yes',

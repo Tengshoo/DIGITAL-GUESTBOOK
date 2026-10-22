@@ -43,7 +43,7 @@ const defaultFallbackEntries: SupabaseGuestEntry[] = [
     id: 1,
     name: 'Harith & Sarah',
     message:
-      'Barakallahu lakuma wa baraka alaikuma wa jamaa bainakuma fi khair! Semoga mahligai yang dibina kekal hingga ke jannah. Selamat pengantin baru Arman & Farah!',
+      'Barakallahu lakuma wa baraka alaikuma wa jamaa bainakuma fi khair! Semoga mahligai yang dibina kekal hingga ke jannah. Selamat pengantin baru Atif & Isma!',
     photo_url: null,
     signature_svg: null,
     audio_url: null,
@@ -54,7 +54,7 @@ const defaultFallbackEntries: SupabaseGuestEntry[] = [
     id: 2,
     name: 'Family Pak Ngah',
     message:
-      'Tahniah Arman & Farah! Sama cantik sama padan. Moga dikurniakan zuriat yang soleh dan solehah serta kebahagiaan berpanjangan.',
+      'Tahniah Atif & Isma! Sama cantik sama padan. Moga dikurniakan zuriat yang soleh dan solehah serta kebahagiaan berpanjangan.',
     photo_url: null,
     signature_svg: null,
     audio_url: null,

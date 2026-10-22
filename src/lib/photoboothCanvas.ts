@@ -60,11 +60,11 @@ export async function generatePhotoboothStripCanvas(
   themeId: PhotoboothStripTheme['id'],
   filterId: PhotoFilter['id'] = 'original',
   eventInfo: EventInfo = {
-    welcomeTitle: 'Arman & Farah',
+    welcomeTitle: 'Atif & Isma',
     miniTitle: 'Majlis Perkahwinan',
     date: '08 Jul 2026',
-    venue: 'Hotel memoira',
-    hashtag: '#ArmanFarah',
+    venue: 'OneTwoKL',
+    hashtag: '#AtifIsma',
   }
 ): Promise<string> {
   // Ensure custom web fonts are loaded prior to canvas text rendering
@@ -238,7 +238,7 @@ export async function generatePhotoboothStripCanvas(
   ctx.fillStyle = 'rgba(120, 100, 90, 0.45)';
   ctx.textAlign = 'center';
   ctx.fillText(
-    `#ArmanFarah • Hotel memoira • 08.07.2026`,
+    `${eventInfo.hashtag} • ${eventInfo.venue} • 08.07.2026`,
     theme.width / 2,
     theme.height - 18
   );

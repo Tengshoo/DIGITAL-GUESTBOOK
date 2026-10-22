@@ -33,11 +33,11 @@ export default function PhotoboothStudio({
   onAttachToGuestbook,
   onClose,
   eventInfo = {
-    welcomeTitle: 'Arman & Farah',
+    welcomeTitle: 'Atif & Isma',
     miniTitle: 'Majlis Perkahwinan',
     date: '08 Jul 2026',
-    venue: 'Hotel memoira',
-    hashtag: '#ArmanFarah',
+    venue: 'OneTwoKL',
+    hashtag: '#AtifIsma',
   },
   isModal = false,
 }: PhotoboothStudioProps) {

@@ -35,10 +35,10 @@ export default function GuestbookPage() {
   // Event details matching the demo
   const eventDetails = {
     miniTitle: 'Majlis Perkahwinan',
-    welcomeTitle: 'Arman & Farah',
+    welcomeTitle: 'Atif & Isma',
     date: '08 Jul 2026',
-    venue: 'Hotel memoira',
-    hashtag: '#ArmanFarah',
+    venue: 'OneTwoKL',
+    hashtag: '#AtifIsma',
     welcomeMessage:
       'Kongsi gambar, video, atau momen indah yang anda rakam bersama kami.',
     bgImage: getAssetPath('/assets/img/arman-farah-venue.png?v=2'),
@@ -629,7 +629,7 @@ export default function GuestbookPage() {
                           <div className="w-8 h-8 rounded-full bg-champagne-100 group-hover:bg-champagne-200 flex items-center justify-center text-champagne-700 transition">
                             <Camera className="w-4 h-4" />
                           </div>
-                          <span className="text-xs font-medium">Ambil Selfie</span>
+                          <span className="text-xs font-medium">Selfie</span>
                         </button>
 
                         <button

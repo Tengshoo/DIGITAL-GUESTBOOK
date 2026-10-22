@@ -11,10 +11,10 @@ export default function PhotoboothPage() {
 
   const eventDetails = {
     miniTitle: 'Majlis Perkahwinan',
-    welcomeTitle: 'Arman & Farah',
+    welcomeTitle: 'Atif & Isma',
     date: '08 Jul 2026',
-    venue: 'Hotel memoira',
-    hashtag: '#ArmanFarah',
+    venue: 'OneTwoKL',
+    hashtag: '#AtifIsma',
   };
 
   const handleAttachToGuestbook = (stripDataUrl: string) => {
