@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import {
   Camera,
@@ -27,6 +27,7 @@ import PhotoFrameSelector, {
   LivePhotoFrameOverlay,
   applyFilterAndFrameToCanvas,
 } from '@/components/PhotoFrameSelector';
+import PhotoboothStudio from '@/components/Photobooth/PhotoboothStudio';
 import { submitGuestbookEntry } from '@/lib/supabase';
 import { getAssetPath } from '@/lib/assets';
 
@@ -55,12 +56,46 @@ export default function GuestbookPage() {
 
   // Modal / Drawer toggle
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isPhotoboothModalOpen, setIsPhotoboothModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Check for pending photobooth strip from /photobooth route or query param
+  useEffect(() => {
+    try {
+      const pendingPhoto = sessionStorage.getItem('pending_guestbook_photo');
+      if (pendingPhoto) {
+        setRawPhotoBase64(pendingPhoto);
+        setPhotoBase64(pendingPhoto);
+        setSelectedFilter('original');
+        setSelectedFrame('none');
+        setIsFormOpen(true);
+        sessionStorage.removeItem('pending_guestbook_photo');
+      }
+
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('openModal') === 'true') {
+          setIsFormOpen(true);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handlePhotoboothComplete = (stripDataUrl: string) => {
+    setRawPhotoBase64(stripDataUrl);
+    setPhotoBase64(stripDataUrl);
+    setSelectedFilter('original');
+    setSelectedFrame('none');
+    setIsPhotoboothModalOpen(false);
+    setIsFormOpen(true);
+  };
 
   // Photo upload handling & client-side compression
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -323,6 +358,15 @@ export default function GuestbookPage() {
             <span>Kongsikan Momen</span>
           </button>
 
+          {/* Photobooth Studio Action: "📸 Studio Photobooth (5 Gaya Strip)" */}
+          <Link
+            href="/photobooth"
+            className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-champagne-800/80 via-warm-900/90 to-amber-900/80 hover:from-champagne-800 hover:to-amber-900 border border-champagne-400/40 text-white font-bold text-xs tracking-wide shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 group backdrop-blur-sm"
+          >
+            <Sparkles className="w-4 h-4 text-champagne-300 group-hover:rotate-12 transition-transform" />
+            <span>📸 Studio Photobooth (5 Pilihan Strip)</span>
+          </Link>
+
           {/* Secondary Action: "Buka Galeri & Live Wall" */}
           <Link
             href="/wall"
@@ -514,50 +558,61 @@ export default function GuestbookPage() {
                       />
                     </div>
                   ) : (
-                    <div className="grid grid-cols-2 gap-2.5">
-                      <input
-                        ref={cameraInputRef}
-                        type="file"
-                        accept="image/*"
-                        capture="user"
-                        onClick={(e) => {
-                          (e.target as HTMLInputElement).value = '';
-                        }}
-                        onChange={handlePhotoUpload}
-                        className="hidden"
-                      />
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onClick={(e) => {
-                          (e.target as HTMLInputElement).value = '';
-                        }}
-                        onChange={handlePhotoUpload}
-                        className="hidden"
-                      />
-
+                    <div className="flex flex-col gap-2.5">
                       <button
                         type="button"
-                        onClick={() => cameraInputRef.current?.click()}
-                        className="flex flex-col items-center justify-center gap-1.5 p-3.5 rounded-2xl border border-warm-200 bg-white hover:bg-champagne-50 hover:border-champagne-300 transition text-warm-800 group"
+                        onClick={() => setIsPhotoboothModalOpen(true)}
+                        className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl border border-champagne-300 bg-gradient-to-r from-amber-50 via-champagne-50 to-rose-50 hover:from-amber-100 hover:to-rose-100 text-champagne-950 font-bold text-xs shadow-xs transition active:scale-[0.98] group"
                       >
-                        <div className="w-9 h-9 rounded-full bg-champagne-100 group-hover:bg-champagne-200 flex items-center justify-center text-champagne-700 transition">
-                          <Camera className="w-4 h-4" />
-                        </div>
-                        <span className="text-xs font-medium">Ambil Selfie</span>
+                        <Sparkles className="w-4 h-4 text-champagne-700 group-hover:rotate-12 transition-transform" />
+                        <span>✨ Ambil Strip Photobooth (5 Gaya Pilihan)</span>
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="flex flex-col items-center justify-center gap-1.5 p-3.5 rounded-2xl border border-warm-200 bg-white hover:bg-warm-100 hover:border-warm-300 transition text-warm-800 group"
-                      >
-                        <div className="w-9 h-9 rounded-full bg-warm-200 flex items-center justify-center text-warm-700 transition">
-                          <ImageIcon className="w-4 h-4" />
-                        </div>
-                        <span className="text-xs font-medium">Pilih Gambar</span>
-                      </button>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <input
+                          ref={cameraInputRef}
+                          type="file"
+                          accept="image/*"
+                          capture="user"
+                          onClick={(e) => {
+                            (e.target as HTMLInputElement).value = '';
+                          }}
+                          onChange={handlePhotoUpload}
+                          className="hidden"
+                        />
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onClick={(e) => {
+                            (e.target as HTMLInputElement).value = '';
+                          }}
+                          onChange={handlePhotoUpload}
+                          className="hidden"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => cameraInputRef.current?.click()}
+                          className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border border-warm-200 bg-white hover:bg-champagne-50 hover:border-champagne-300 transition text-warm-800 group"
+                        >
+                          <div className="w-8 h-8 rounded-full bg-champagne-100 group-hover:bg-champagne-200 flex items-center justify-center text-champagne-700 transition">
+                            <Camera className="w-4 h-4" />
+                          </div>
+                          <span className="text-xs font-medium">Ambil Selfie</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border border-warm-200 bg-white hover:bg-warm-100 hover:border-warm-300 transition text-warm-800 group"
+                        >
+                          <div className="w-8 h-8 rounded-full bg-warm-200 flex items-center justify-center text-warm-700 transition">
+                            <ImageIcon className="w-4 h-4" />
+                          </div>
+                          <span className="text-xs font-medium">Pilih Gambar</span>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -587,6 +642,20 @@ export default function GuestbookPage() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 6. In-Page Photobooth Studio Modal */}
+      {isPhotoboothModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-4xl max-h-[94dvh] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-[#FAF8F5] rounded-3xl p-4 sm:p-7 shadow-2xl border border-champagne-300 relative">
+            <PhotoboothStudio
+              eventInfo={eventDetails}
+              onClose={() => setIsPhotoboothModalOpen(false)}
+              onAttachToGuestbook={handlePhotoboothComplete}
+              isModal
+            />
           </div>
         </div>
       )}

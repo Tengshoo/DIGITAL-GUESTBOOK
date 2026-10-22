@@ -15,6 +15,7 @@ import {
   Grid,
   Monitor,
   Volume2,
+  Camera,
 } from 'lucide-react';
 import Link from 'next/link';
 import AudioPlayer from '@/components/AudioPlayer';
@@ -238,6 +239,16 @@ export default function WallModePage() {
             <span className="hidden sm:inline">Guest QR</span>
           </button>
 
+          {/* Photobooth Studio Link */}
+          <Link
+            href="/photobooth"
+            title="Buka Photobooth Studio"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-warm-200 bg-white/10 hover:bg-white/20 border border-white/20 transition"
+          >
+            <Camera className="w-4 h-4 text-champagne-300" />
+            <span className="hidden sm:inline">Photobooth</span>
+          </Link>
+
           {/* Fullscreen Toggle */}
           <button
             onClick={toggleFullscreen}
@@ -279,12 +290,12 @@ export default function WallModePage() {
               >
                 <div>
                   {entry.photo_url && (
-                    <div className="mb-4 rounded-xl overflow-hidden bg-warm-100 border border-warm-200 aspect-[4/3]">
+                    <div className="mb-4 rounded-xl overflow-hidden bg-warm-100/70 border border-warm-200/80 max-h-72 w-full flex items-center justify-center">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={entry.photo_url}
                         alt={`Photo from ${entry.name}`}
-                        className="w-full h-full object-cover"
+                        className="max-h-72 w-auto max-w-full object-contain rounded-lg"
                       />
                     </div>
                   )}
@@ -331,12 +342,12 @@ export default function WallModePage() {
                 {activeEntry.photo_url ? (
                   <div className="lg:col-span-5 flex flex-col items-center">
                     <div className="relative p-3 bg-white rounded-2xl shadow-polaroid border border-warm-200 rotate-[-1.5deg] hover:rotate-0 transition-transform duration-500 max-w-sm w-full">
-                      <div className="aspect-[4/3] sm:aspect-square rounded-xl overflow-hidden bg-warm-100">
+                      <div className="max-h-[360px] sm:max-h-[440px] flex items-center justify-center rounded-xl overflow-hidden bg-warm-100/60">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={activeEntry.photo_url}
                           alt={`Memory captured by ${activeEntry.name}`}
-                          className="w-full h-full object-cover"
+                          className="max-h-[360px] sm:max-h-[440px] w-auto max-w-full object-contain rounded-lg"
                         />
                       </div>
                       <div className="pt-2 text-center">

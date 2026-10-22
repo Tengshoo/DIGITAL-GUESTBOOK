@@ -1,0 +1,700 @@
+'use client';
+
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import confetti from 'canvas-confetti';
+import {
+  Camera,
+  RotateCcw,
+  Sparkles,
+  Download,
+  Send,
+  SwitchCamera,
+  Image as ImageIcon,
+  Check,
+  ChevronRight,
+  Heart,
+  Wand2,
+  Play,
+  X,
+} from 'lucide-react';
+import { PHOTOBOOTH_STRIP_THEMES, PhotoboothStripTheme } from './stripThemes';
+import PhotoboothStripView from './PhotoboothStripView';
+import { generatePhotoboothStripCanvas, downloadStripImage, EventInfo } from '@/lib/photoboothCanvas';
+import { PHOTO_FILTERS, PhotoFilter } from '@/components/PhotoFilterSelector';
+
+interface PhotoboothStudioProps {
+  onAttachToGuestbook?: (stripDataUrl: string) => void;
+  onClose?: () => void;
+  eventInfo?: EventInfo;
+  isModal?: boolean;
+}
+
+export default function PhotoboothStudio({
+  onAttachToGuestbook,
+  onClose,
+  eventInfo = {
+    welcomeTitle: 'Arman & Farah',
+    miniTitle: 'Majlis Perkahwinan',
+    date: '08 Jul 2026',
+    venue: 'Hotel memoira',
+    hashtag: '#ArmanFarah',
+  },
+  isModal = false,
+}: PhotoboothStudioProps) {
+  // State
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [activeSlot, setActiveSlot] = useState<number>(0);
+  const [selectedTheme, setSelectedTheme] = useState<PhotoboothStripTheme['id']>('champagne-gold');
+  const [selectedFilter, setSelectedFilter] = useState<PhotoFilter['id']>('original');
+  const [slotCount, setSlotCount] = useState<number>(4); // 4-cut or 3-cut
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+
+  // Camera stream & recording
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+  // Countdown & auto-booth flow
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [isAutoShooting, setIsAutoShooting] = useState(false);
+  const [autoShootStep, setAutoShootStep] = useState<number>(0);
+  const [autoShootMessage, setAutoShootMessage] = useState<string>('');
+  const [isFlashing, setIsFlashing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Hidden file input for uploading from device
+  const fileUploadRef = useRef<HTMLInputElement | null>(null);
+
+  // Web Audio shutter click
+  const playShutterSound = useCallback(() => {
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.08);
+
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.08);
+    } catch {
+      // Audio autoplay blocked or unsupported - silent fallback
+    }
+  }, []);
+
+  // Initialize Camera
+  const startCamera = useCallback(async () => {
+    setCameraError(null);
+    try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Kamera tidak disokong pada pelayar ini.');
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode,
+          width: { ideal: 1280 },
+          height: { ideal: 960 },
+        },
+        audio: false,
+      });
+
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setIsCameraActive(true);
+    } catch (err: unknown) {
+      console.warn('Camera permission or init failed:', err);
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Sila benarkan akses kamera untuk menggunakan photobooth.';
+      setCameraError(msg);
+      setIsCameraActive(false);
+    }
+  }, [facingMode]);
+
+  // Cleanup Camera on unmount
+  useEffect(() => {
+    startCamera();
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [startCamera]);
+
+  // Toggle front/back camera
+  const toggleCamera = () => {
+    setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user'));
+  };
+
+  // Capture a single frame from the live video element
+  const captureSnapshot = useCallback(
+    (targetSlotIndex?: number) => {
+      const video = videoRef.current;
+      if (!video) return null;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+
+      // If front camera, mirror image so it behaves like a natural mirror
+      if (facingMode === 'user') {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+      // Trigger visual flash & audio sound
+      setIsFlashing(true);
+      playShutterSound();
+      setTimeout(() => setIsFlashing(false), 200);
+
+      const targetIdx = targetSlotIndex !== undefined ? targetSlotIndex : activeSlot;
+      setPhotos((prev) => {
+        const next = [...prev];
+        next[targetIdx] = dataUrl;
+        return next;
+      });
+
+      // Move active slot to the next one
+      if (targetIdx + 1 < slotCount) {
+        setActiveSlot(targetIdx + 1);
+      }
+
+      return dataUrl;
+    },
+    [activeSlot, facingMode, playShutterSound, slotCount]
+  );
+
+  // Countdown timer trigger
+  const runCountdownAndCapture = (targetSlot: number, onDone?: () => void) => {
+    let timeLeft = 3;
+    setCountdown(timeLeft);
+
+    const timer = setInterval(() => {
+      timeLeft -= 1;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        setCountdown(null);
+        captureSnapshot(targetSlot);
+        if (onDone) onDone();
+      } else {
+        setCountdown(timeLeft);
+      }
+    }, 1000);
+  };
+
+  // Auto-Booth sequence: takes 4 shots automatically with 3s intervals
+  const startAutoBooth = () => {
+    if (!isCameraActive) {
+      startCamera();
+      return;
+    }
+
+    setIsAutoShooting(true);
+    setPhotos([]);
+    setActiveSlot(0);
+
+    const poses = [
+      'Pose 1: Senyuman Manis! ✨',
+      'Pose 2: Tanda Peace / Mini Heart! ✌️',
+      'Pose 3: Gaya Ceria / Lucu! 🤪',
+      'Pose 4: Gaya Akhir Paling Meletup! 🎉',
+    ];
+
+    let currentStep = 0;
+
+    const executeStep = (step: number) => {
+      if (step >= slotCount) {
+        setIsAutoShooting(false);
+        setAutoShootMessage('');
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+        return;
+      }
+
+      setAutoShootStep(step + 1);
+      setAutoShootMessage(poses[step] || `Gaya Slot ${step + 1}`);
+
+      runCountdownAndCapture(step, () => {
+        // Wait 2.2 seconds between shots so guests can change their pose
+        setTimeout(() => {
+          currentStep += 1;
+          executeStep(currentStep);
+        }, 2200);
+      });
+    };
+
+    executeStep(0);
+  };
+
+  // Upload image from phone gallery into currently active slot
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const result = evt.target?.result as string;
+      if (result) {
+        setPhotos((prev) => {
+          const next = [...prev];
+          next[activeSlot] = result;
+          return next;
+        });
+
+        if (activeSlot + 1 < slotCount) {
+          setActiveSlot(activeSlot + 1);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Clear a specific slot
+  const clearSlot = (idx: number) => {
+    setPhotos((prev) => {
+      const next = [...prev];
+      next[idx] = '';
+      return next;
+    });
+    setActiveSlot(idx);
+  };
+
+  // Reset all photos
+  const resetAll = () => {
+    setPhotos([]);
+    setActiveSlot(0);
+  };
+
+  // Download high-resolution strip
+  const handleDownload = async () => {
+    if (photos.filter(Boolean).length === 0) return;
+    setIsExporting(true);
+
+    try {
+      const validPhotos = photos.filter(Boolean);
+      const dataUrl = await generatePhotoboothStripCanvas(
+        validPhotos,
+        selectedTheme,
+        selectedFilter,
+        eventInfo
+      );
+
+      const filename = `${eventInfo.welcomeTitle.replace(/\s+/g, '_')}_Photobooth_Strip.jpg`;
+      downloadStripImage(dataUrl, filename);
+
+      confetti({
+        particleCount: 100,
+        spread: 60,
+        origin: { y: 0.7 },
+      });
+    } catch (err) {
+      console.error('Failed to export strip:', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Attach strip directly to guestbook
+  const handleAttach = async () => {
+    if (photos.filter(Boolean).length === 0 || !onAttachToGuestbook) return;
+    setIsExporting(true);
+
+    try {
+      const validPhotos = photos.filter(Boolean);
+      const dataUrl = await generatePhotoboothStripCanvas(
+        validPhotos,
+        selectedTheme,
+        selectedFilter,
+        eventInfo
+      );
+      onAttachToGuestbook(dataUrl);
+    } catch (err) {
+      console.error('Failed to attach strip:', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const hasPhotos = photos.filter(Boolean).length > 0;
+  const isFull = photos.filter(Boolean).length === slotCount;
+
+  return (
+    <div className="w-full flex flex-col items-center animate-fade-in relative">
+      {/* Screen flash effect */}
+      {isFlashing && (
+        <div className="fixed inset-0 z-50 bg-white pointer-events-none animate-ping" />
+      )}
+
+      {/* Hidden file input */}
+      <input
+        ref={fileUploadRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileUpload}
+        className="hidden"
+      />
+
+      {/* Studio Top Bar */}
+      <div className="w-full flex items-center justify-between pb-4 border-b border-warm-200/80 mb-5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-champagne-600 to-champagne-400 text-white flex items-center justify-center shadow-champagne">
+            <Sparkles className="w-5 h-5 animate-pulse" />
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h2 className="font-serif font-bold text-lg sm:text-xl text-warm-900">
+                Photobooth Studio
+              </h2>
+              <span className="px-2 py-0.5 rounded-full bg-champagne-100 text-champagne-800 text-[10px] font-bold uppercase tracking-wider">
+                5 Strips
+              </span>
+            </div>
+            <p className="text-xs text-warm-600">
+              Rakam momen indah atau pilih gambar untuk strip kenangan anda.
+            </p>
+          </div>
+        </div>
+
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-full bg-warm-100 hover:bg-warm-200 text-warm-700 transition"
+            title="Tutup Studio"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+
+      {/* Studio Main Workspace: 2-column on desktop, stacked on mobile */}
+      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column (Lg: 7 cols): Live Camera / Capture Station */}
+        <div className="lg:col-span-7 flex flex-col gap-4">
+          {/* Live Camera Viewport */}
+          <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-black shadow-2xl border-2 border-champagne-300/60 flex items-center justify-center group">
+            {isCameraActive ? (
+              <video
+                ref={videoRef}
+                playsInline
+                muted
+                autoPlay
+                className={`w-full h-full object-cover ${
+                  facingMode === 'user' ? 'scale-x-[-1]' : ''
+                }`}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-center p-6 text-warm-300">
+                <Camera className="w-12 h-12 mb-3 text-champagne-400 opacity-60" />
+                <p className="font-serif italic text-base text-warm-100 mb-2">
+                  Kamera belum aktif
+                </p>
+                {cameraError ? (
+                  <p className="text-xs text-rose-300 max-w-xs mb-4">{cameraError}</p>
+                ) : (
+                  <p className="text-xs text-warm-300/80 max-w-xs mb-4">
+                    Sila aktifkan kamera pelayar anda atau muat naik foto dari galeri.
+                  </p>
+                )}
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={startCamera}
+                    className="px-4 py-2 rounded-xl bg-champagne-500 hover:bg-champagne-600 text-warm-950 font-semibold text-xs transition shadow-md"
+                  >
+                    Hidupkan Kamera
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fileUploadRef.current?.click()}
+                    className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white font-medium text-xs transition border border-white/30"
+                  >
+                    Pilih Dari Galeri
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Countdown Overlay Display */}
+            {countdown !== null && (
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center text-white z-30 animate-fade-in">
+                <span className="font-serif text-8xl font-black drop-shadow-lg text-champagne-300 scale-125 transition-transform animate-ping">
+                  {countdown}
+                </span>
+                <span className="text-sm font-sans tracking-widest uppercase font-semibold text-warm-200 mt-4">
+                  Sedia untuk bergaya! 📸
+                </span>
+              </div>
+            )}
+
+            {/* Auto-shoot Banner notification */}
+            {isAutoShooting && autoShootMessage && (
+              <div className="absolute top-4 left-4 right-4 z-20 px-4 py-2.5 rounded-2xl bg-black/75 backdrop-blur-md text-white text-xs font-semibold flex items-center justify-between border border-champagne-400/40 shadow-lg animate-fade-down">
+                <span className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
+                  <span>{autoShootMessage}</span>
+                </span>
+                <span className="text-champagne-300 font-mono text-[11px]">
+                  Shot {autoShootStep}/{slotCount}
+                </span>
+              </div>
+            )}
+
+            {/* Camera Floating Controls Overlay */}
+            {isCameraActive && (
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10">
+                {/* Switch Front/Back Camera */}
+                <button
+                  type="button"
+                  onClick={toggleCamera}
+                  className="pointer-events-auto p-2.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-md transition active:scale-95"
+                  title="Tukar Kamera Depan/Belakang"
+                >
+                  <SwitchCamera className="w-4 h-4" />
+                </button>
+
+                {/* Upload single slot file */}
+                <button
+                  type="button"
+                  onClick={() => fileUploadRef.current?.click()}
+                  className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-xs font-medium border border-white/20 shadow-md transition"
+                >
+                  <ImageIcon className="w-3.5 h-3.5 text-champagne-300" />
+                  <span>Pilih Galeri</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Primary Camera Triggers */}
+          <div className="flex flex-col sm:flex-row items-center gap-2.5">
+            {/* Auto-Booth 4-Shots Button */}
+            <button
+              type="button"
+              disabled={isAutoShooting || !isCameraActive}
+              onClick={startAutoBooth}
+              className="w-full sm:flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-champagne-500 via-champagne-400 to-champagne-500 hover:from-champagne-600 hover:to-champagne-500 text-warm-950 font-bold text-sm tracking-wide shadow-champagne transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <Play className="w-4 h-4 fill-warm-950" />
+              <span>
+                {isAutoShooting
+                  ? `Mengambil Gambar (${autoShootStep}/${slotCount})...`
+                  : `Mula Auto-Booth (${slotCount} Shots)`}
+              </span>
+            </button>
+
+            {/* Snap Single Shot Button */}
+            <button
+              type="button"
+              disabled={isAutoShooting || !isCameraActive}
+              onClick={() => runCountdownAndCapture(activeSlot)}
+              className="w-full sm:w-auto py-3.5 px-5 rounded-2xl bg-white hover:bg-warm-50 border border-warm-200 text-warm-800 font-semibold text-sm transition shadow-sm active:scale-95 flex items-center justify-center gap-2"
+            >
+              <Camera className="w-4 h-4 text-champagne-600" />
+              <span>Ambil Slot {activeSlot + 1}</span>
+            </button>
+          </div>
+
+          {/* Slot Count Toggle (3 Cuts vs 4 Cuts) */}
+          <div className="flex items-center justify-between p-3 rounded-2xl bg-white/80 border border-warm-200/80 shadow-soft">
+            <span className="text-xs font-semibold text-warm-700">
+              Format Potongan Strip:
+            </span>
+            <div className="flex items-center gap-1.5">
+              {[3, 4].map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  onClick={() => {
+                    setSlotCount(count);
+                    if (activeSlot >= count) setActiveSlot(count - 1);
+                  }}
+                  className={`px-3 py-1 rounded-xl text-xs font-semibold transition ${
+                    slotCount === count
+                      ? 'bg-champagne-600 text-white shadow-sm'
+                      : 'bg-warm-100 text-warm-600 hover:bg-warm-200'
+                  }`}
+                >
+                  {count} Cuts
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 5 Strip Themes Selection Bar */}
+          <div className="flex flex-col gap-2 pt-1">
+            <div className="flex items-center justify-between text-xs text-warm-700">
+              <span className="font-bold flex items-center gap-1.5">
+                <Wand2 className="w-3.5 h-3.5 text-champagne-600" />
+                <span>Pilih Gaya Strip Photobooth (5 Pilihan)</span>
+              </span>
+              <span className="text-[11px] text-warm-500">Sentuh untuk lihat</span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              {PHOTOBOOTH_STRIP_THEMES.map((theme) => {
+                const isSelected = selectedTheme === theme.id;
+                return (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    onClick={() => setSelectedTheme(theme.id)}
+                    className={`relative flex flex-col items-center justify-between p-2.5 rounded-2xl border text-center transition-all ${
+                      isSelected
+                        ? 'border-champagne-500 bg-champagne-50/90 shadow-champagne ring-2 ring-champagne-300 scale-[1.02]'
+                        : 'border-warm-200 bg-white/80 hover:bg-warm-50 hover:border-warm-300'
+                    }`}
+                  >
+                    <span className="text-xl mb-1">{theme.icon}</span>
+                    <span
+                      className={`text-xs font-bold leading-tight ${
+                        isSelected ? 'text-champagne-950' : 'text-warm-800'
+                      }`}
+                    >
+                      {theme.name}
+                    </span>
+                    <span className="text-[9px] text-warm-400 mt-0.5 line-clamp-1">
+                      {theme.subtitle}
+                    </span>
+
+                    {isSelected && (
+                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-champagne-600 text-white flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Photo Filters Bar */}
+          <div className="flex flex-col gap-2 pt-1">
+            <span className="text-xs font-semibold text-warm-700">
+              Penapis Warna Gambar (Filter)
+            </span>
+            <div className="grid grid-cols-4 gap-2">
+              {PHOTO_FILTERS.map((f) => {
+                const isSelected = selectedFilter === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setSelectedFilter(f.id)}
+                    className={`py-2 px-2.5 rounded-xl border text-xs font-medium text-center transition ${
+                      isSelected
+                        ? 'border-champagne-500 bg-champagne-50 text-champagne-950 font-bold ring-1 ring-champagne-300'
+                        : 'border-warm-200 bg-white/80 text-warm-700 hover:bg-warm-100'
+                    }`}
+                  >
+                    {f.shortLabel}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (Lg: 5 cols): Live Strip Preview & Output Actions */}
+        <div className="lg:col-span-5 flex flex-col items-center gap-4 bg-warm-50/70 p-4 sm:p-5 rounded-3xl border border-warm-200/80">
+          <div className="w-full flex items-center justify-between pb-2 border-b border-warm-200/60">
+            <span className="text-xs font-bold uppercase tracking-wider text-warm-700 flex items-center gap-1.5">
+              <span>Pratonton Strip</span>
+              <span className="text-[10px] font-normal lowercase text-warm-400">
+                (live preview)
+              </span>
+            </span>
+
+            {hasPhotos && (
+              <button
+                type="button"
+                onClick={resetAll}
+                className="text-[11px] font-medium text-rose-600 hover:text-rose-800 flex items-center gap-1 transition"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Mula Semula</span>
+              </button>
+            )}
+          </div>
+
+          {/* Live Photobooth Strip Component */}
+          <div className="w-full flex justify-center py-2 overflow-x-auto">
+            <PhotoboothStripView
+              photos={photos}
+              themeId={selectedTheme}
+              filterId={selectedFilter}
+              activeSlotIndex={activeSlot}
+              onSelectSlot={(idx) => setActiveSlot(idx)}
+              onClearSlot={(idx) => clearSlot(idx)}
+              eventInfo={eventInfo}
+              totalSlots={slotCount}
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="w-full flex flex-col gap-2.5 pt-2">
+            {/* Download Strip Button */}
+            <button
+              type="button"
+              disabled={!hasPhotos || isExporting}
+              onClick={handleDownload}
+              className="w-full py-3.5 px-4 rounded-2xl bg-champagne-600 hover:bg-champagne-700 text-white font-semibold text-sm transition shadow-champagne active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2"
+            >
+              {isExporting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Menjana Strip HD...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  <span>Muat Turun Strip Photobooth</span>
+                </>
+              )}
+            </button>
+
+            {/* Attach to Guestbook / Share Button */}
+            {onAttachToGuestbook && (
+              <button
+                type="button"
+                disabled={!hasPhotos || isExporting}
+                onClick={handleAttach}
+                className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-warm-100 border border-warm-200 text-warm-900 font-semibold text-xs transition shadow-sm active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2"
+              >
+                <Heart className="w-3.5 h-3.5 text-rose-500 fill-current" />
+                <span>Guna Strip Ini Dalam Buku Tetamu</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
