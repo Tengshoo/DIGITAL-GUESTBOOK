@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Sparkles, ArrowLeft, Tv, Heart, Camera } from 'lucide-react';
 import PhotoboothStudio from '@/components/Photobooth/PhotoboothStudio';
+import { useLanguage, LanguageToggle } from '@/lib/i18n';
 
 export default function PhotoboothPage() {
   const router = useRouter();
+  const { language, t } = useLanguage();
 
   const eventDetails = {
-    miniTitle: 'Majlis Perkahwinan',
+    miniTitle: language === 'ms' ? 'Majlis Pertunangan' : 'Engagement Celebration',
     welcomeTitle: 'Atif & Isma',
     date: '08 Jul 2026',
     venue: 'OneTwoKL',
@@ -31,13 +33,14 @@ export default function PhotoboothPage() {
     <div className="w-full min-h-[100dvh] bg-[#FAF8F5] text-warm-900 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))]">
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md border-b border-warm-200/80 px-4 sm:px-6 py-3.5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
           <Link
             href="/"
             className="flex items-center gap-1.5 text-xs font-semibold text-warm-700 hover:text-warm-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 text-champagne-600" />
-            <span>Kembali ke Laman Utama</span>
+            <span className="hidden sm:inline">{t.backHome}</span>
+            <span className="sm:hidden">{language === 'ms' ? 'Utama' : 'Home'}</span>
           </Link>
 
           <div className="flex items-center gap-2">
@@ -45,16 +48,21 @@ export default function PhotoboothPage() {
               {eventDetails.welcomeTitle}
             </span>
             <span className="hidden sm:inline-block text-xs text-warm-400">•</span>
-            <span className="hidden sm:inline-block text-xs text-warm-500">Photobooth Studio</span>
+            <span className="hidden sm:inline-block text-xs text-warm-500">
+              {language === 'ms' ? 'Studio Photobooth' : 'Photobooth Studio'}
+            </span>
           </div>
 
-          <Link
-            href="/wall"
-            className="px-3.5 py-1.5 rounded-xl bg-champagne-50 hover:bg-champagne-100 border border-champagne-200 text-champagne-800 text-xs font-medium transition-colors flex items-center gap-1.5 shadow-xs active:scale-95"
-          >
-            <Tv className="w-3.5 h-3.5 text-champagne-600" />
-            <span className="hidden sm:inline">Live Wall</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <LanguageToggle lightMode />
+            <Link
+              href="/wall"
+              className="px-3 py-1 rounded-xl bg-champagne-50 hover:bg-champagne-100 border border-champagne-200 text-champagne-800 text-xs font-medium transition-colors flex items-center gap-1.5 shadow-xs active:scale-95"
+            >
+              <Tv className="w-3.5 h-3.5 text-champagne-600" />
+              <span className="hidden sm:inline">Live Wall</span>
+            </Link>
+          </div>
         </div>
       </header>
 

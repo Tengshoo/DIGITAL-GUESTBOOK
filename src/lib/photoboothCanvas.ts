@@ -61,7 +61,7 @@ export async function generatePhotoboothStripCanvas(
   filterId: PhotoFilter['id'] = 'original',
   eventInfo: EventInfo = {
     welcomeTitle: 'Atif & Isma',
-    miniTitle: 'Majlis Perkahwinan',
+    miniTitle: 'Majlis Pertunangan',
     date: '08 Jul 2026',
     venue: 'OneTwoKL',
     hashtag: '#AtifIsma',

@@ -221,7 +221,7 @@ export default function WallModePage() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            title="Kembali ke Laman Utama / Back to Home"
+            title="Back to Home"
             className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-warm-900/80 hover:bg-champagne-600/90 border border-warm-700/80 hover:border-champagne-400 text-warm-200 hover:text-white text-xs font-medium transition shadow-md group"
           >
             <ArrowLeft className="w-4 h-4 text-champagne-300 group-hover:text-white group-hover:-translate-x-0.5 transition-transform" />
@@ -268,7 +268,7 @@ export default function WallModePage() {
           {/* Photobooth Studio Link */}
           <Link
             href="/photobooth"
-            title="Buka Photobooth Studio"
+            title="Photobooth Studio"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-warm-200 bg-white/10 hover:bg-white/20 border border-white/20 transition"
           >
             <Camera className="w-4 h-4 text-champagne-300" />

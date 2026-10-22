@@ -30,17 +30,19 @@ import PhotoFrameSelector, {
 import PhotoboothStudio from '@/components/Photobooth/PhotoboothStudio';
 import { submitGuestbookEntry } from '@/lib/supabase';
 import { getAssetPath } from '@/lib/assets';
+import { useLanguage, LanguageToggle } from '@/lib/i18n';
 
 export default function GuestbookPage() {
+  const { language, t } = useLanguage();
+
   // Event details matching the demo
   const eventDetails = {
-    miniTitle: 'Majlis Perkahwinan',
+    miniTitle: t.miniTitle,
     welcomeTitle: 'Atif & Isma',
-    date: '08 Jul 2026',
-    venue: 'OneTwoKL',
-    hashtag: '#AtifIsma',
-    welcomeMessage:
-      'Kongsi gambar, video, atau momen indah yang anda rakam bersama kami.',
+    date: t.date,
+    venue: t.venue,
+    hashtag: t.hashtag,
+    welcomeMessage: t.welcomeMessage,
     bgImage: getAssetPath('/assets/img/arman-farah-venue.png?v=2'),
     avatarImage: getAssetPath('/assets/img/arman-farah-welcome.jpg'),
   };
@@ -118,7 +120,7 @@ export default function GuestbookPage() {
       ? file.type.startsWith('image/')
       : /\.(jpe?g|png|webp|heic|heif|gif)$/i.test(file.name);
     if (!isImage && file.type) {
-      setErrorMsg('Sila pilih fail gambar yang sah (JPEG/PNG/HEIC).');
+      setErrorMsg(t.errorInvalidImage);
       return;
     }
 
@@ -202,12 +204,12 @@ export default function GuestbookPage() {
     setErrorMsg(null);
 
     if (!name.trim()) {
-      setErrorMsg('Sila masukkan nama anda.');
+      setErrorMsg(t.errorNameRequired);
       return;
     }
 
     if (!message.trim()) {
-      setErrorMsg('Sila tinggalkan ucapan atau doa tulus anda.');
+      setErrorMsg(t.errorMessageRequired);
       return;
     }
 
@@ -231,7 +233,7 @@ export default function GuestbookPage() {
       });
 
       if (!result.success) {
-        throw new Error(result.error || 'Gagal menghantar ucapan.');
+        throw new Error(result.error || t.errorGenericSubmit);
       }
 
       setIsSuccess(true);
@@ -240,7 +242,7 @@ export default function GuestbookPage() {
       const msg =
         err instanceof Error
           ? err.message
-          : 'Berlaku ralat semasa menyimpan memori anda.';
+          : t.errorGenericSubmit;
       setErrorMsg(msg);
     } finally {
       setIsSubmitting(false);
@@ -270,10 +272,10 @@ export default function GuestbookPage() {
     PHOTO_FRAMES.find((f) => f.id === selectedFrame) || PHOTO_FRAMES[0];
 
   return (
-    <div className="relative w-full min-h-screen min-h-[100lvh] flex flex-col justify-between overflow-x-hidden text-white select-none bg-[#120F0D]">
+    <div className="relative w-full min-h-screen min-h-[100lvh] flex flex-col justify-between overflow-x-clip text-white select-none bg-[#120F0D]">
       {/* 1. Full-Bleed Cinematic Background - 100% Static During Mobile Scroll */}
       <div
-        className="fixed top-[-2vh] left-0 w-full h-[104lvh] min-h-[104lvh] pointer-events-none overflow-hidden z-0 gpu-layer"
+        className="fixed -top-[6vh] left-0 w-full h-[112lvh] min-h-[112lvh] pointer-events-none overflow-hidden z-0 gpu-layer"
         style={{
           transform: 'translate3d(0, 0, 0)',
           WebkitTransform: 'translate3d(0, 0, 0)',
@@ -300,13 +302,16 @@ export default function GuestbookPage() {
           <span>{eventDetails.hashtag}</span>
         </div>
 
-        <Link
-          href="/wall"
-          className="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs text-warm-200 transition-colors shadow-xs active:scale-95"
-        >
-          <Tv className="w-3.5 h-3.5 text-champagne-400" />
-          <span>Live Wall</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <Link
+            href="/wall"
+            className="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs sm:backdrop-blur-md border border-white/20 text-xs text-warm-200 transition-colors shadow-xs active:scale-95"
+          >
+            <Tv className="w-3.5 h-3.5 text-champagne-400" />
+            <span>{t.liveWall}</span>
+          </Link>
+        </div>
       </header>
 
       {/* 3. Main Centered Cover Content */}
@@ -361,51 +366,51 @@ export default function GuestbookPage() {
               htmlFor="guest-name-cover"
               className="text-xs uppercase font-semibold tracking-wider text-champagne-300"
             >
-              Nama anda
+              {t.yourName}
             </label>
             <input
               id="guest-name-cover"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Masukkan nama anda..."
+              placeholder={t.enterNamePlaceholder}
               className="w-full px-4 py-3.5 rounded-2xl border border-white/25 bg-white/10 text-white placeholder-white/50 text-center text-[16px] sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-champagne-400 focus:bg-black/40 transition-colors"
             />
           </div>
 
-          {/* Primary Action Button: "Kongsikan Momen" */}
+          {/* Primary Action Button: Share Wishes */}
           <button
             type="button"
             onClick={openFormWithName}
             className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-champagne-500 via-champagne-400 to-champagne-500 hover:from-champagne-600 hover:to-champagne-500 text-warm-950 font-bold text-sm tracking-wide shadow-champagne transition-transform duration-150 active:scale-[0.98] flex items-center justify-center gap-2 gpu-layer"
           >
             <Camera className="w-4 h-4 fill-warm-950" />
-            <span>Kongsikan Momen</span>
+            <span>{t.shareMomentBtn}</span>
           </button>
 
-          {/* Photobooth Studio Action: "📸 Studio Photobooth (6 Pilihan Strip)" */}
+          {/* Photobooth Studio Action */}
           <Link
             href="/photobooth"
             className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-champagne-800/80 via-warm-900/90 to-amber-900/80 hover:from-champagne-800 hover:to-amber-900 border border-champagne-400/40 text-white font-bold text-xs tracking-wide shadow-lg transition-transform duration-150 active:scale-[0.98] flex items-center justify-center gap-2 group backdrop-blur-xs sm:backdrop-blur-sm gpu-layer"
           >
             <Sparkles className="w-4 h-4 text-champagne-300 group-hover:rotate-12 transition-transform duration-200" />
-            <span>📸 Studio Photobooth (6 Pilihan Strip)</span>
+            <span>{t.photoboothBtn}</span>
           </Link>
 
-          {/* Secondary Action: "Buka Galeri & Live Wall" */}
+          {/* Secondary Action: Live Wall */}
           <Link
             href="/wall"
             className="w-full py-3 px-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium text-xs transition-colors flex items-center justify-center gap-2"
           >
             <Tv className="w-3.5 h-3.5 text-champagne-300" />
-            <span>Buka Galeri & Live Wall</span>
+            <span>{t.liveWallBtn}</span>
           </Link>
         </div>
       </main>
 
       {/* Footer */}
       <footer className="relative z-10 w-full text-center py-4 safe-pb text-[11px] text-white/50 backdrop-blur-xs sm:backdrop-blur-sm">
-        <p>memoira • {eventDetails.welcomeTitle} Celebration</p>
+        <p>{t.footerCelebration.replace('{title}', eventDetails.welcomeTitle)}</p>
       </footer>
 
       {/* 5. Interactive Submission Modal / Sheet */}
@@ -428,21 +433,24 @@ export default function GuestbookPage() {
                 </div>
                 <div>
                   <h3 className="font-serif font-bold text-lg text-warm-900">
-                    Tinggalkan Momen & Ucapan
+                    {t.modalTitle}
                   </h3>
                   <p className="text-[11px] text-warm-500">
-                    Untuk {eventDetails.welcomeTitle}
+                    {t.forCouple.replace('{title}', eventDetails.welcomeTitle)}
                   </p>
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsFormOpen(false)}
-                className="p-1.5 rounded-full hover:bg-warm-200 text-warm-600 transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <LanguageToggle lightMode />
+                <button
+                  type="button"
+                  onClick={() => setIsFormOpen(false)}
+                  className="p-1.5 rounded-full hover:bg-warm-200 text-warm-600 transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Success Celebration View */}
@@ -453,13 +461,13 @@ export default function GuestbookPage() {
                 </div>
 
                 <h2 className="font-serif text-3xl font-bold text-warm-900 mb-2">
-                  Terima Kasih, {name}!
+                  {t.thankYouTitle.replace('{name}', name)}
                 </h2>
                 <p className="font-serif italic text-base text-champagne-800 mb-2">
-                  Ucapan & memori indah anda telah selamat disimpan.
+                  {t.thankYouSubtitle}
                 </p>
                 <p className="text-xs text-warm-600 max-w-sm mx-auto mb-6">
-                  Memori anda akan dipaparkan secara langsung pada skrin Live Wall majlis.
+                  {t.thankYouLiveWallNote}
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5">
@@ -468,14 +476,14 @@ export default function GuestbookPage() {
                     onClick={resetForm}
                     className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-white hover:bg-warm-100 text-warm-800 border border-warm-300 font-medium text-xs transition"
                   >
-                    Hantar Ucapan Lain
+                    {t.sendAnotherBtn}
                   </button>
                   <Link
                     href="/wall"
                     className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full bg-champagne-600 hover:bg-champagne-700 text-white font-medium text-xs transition shadow-champagne"
                   >
                     <Tv className="w-3.5 h-3.5" />
-                    <span>Tonton Live Wall</span>
+                    <span>{t.watchLiveWallBtn}</span>
                   </Link>
                 </div>
               </div>
@@ -497,7 +505,7 @@ export default function GuestbookPage() {
                     htmlFor="guest-name-modal"
                     className="text-xs font-semibold uppercase tracking-wider text-warm-700"
                   >
-                    Nama Anda <span className="text-rose-500">*</span>
+                    {t.yourName} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     id="guest-name-modal"
@@ -505,7 +513,7 @@ export default function GuestbookPage() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Contoh: Sarah & Michael"
+                    placeholder={language === 'ms' ? 'Contoh: Sarah & Michael' : 'e.g. Sarah & Michael'}
                     maxLength={100}
                     className="w-full px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-champagne-400 text-[16px] sm:text-sm"
                   />
@@ -517,7 +525,7 @@ export default function GuestbookPage() {
                     htmlFor="guest-message-modal"
                     className="text-xs font-semibold uppercase tracking-wider text-warm-700"
                   >
-                    Ucapan & Doa Tulus <span className="text-rose-500">*</span>
+                    {t.wishesLabel} <span className="text-rose-500">*</span>
                   </label>
                   <textarea
                     id="guest-message-modal"
@@ -525,19 +533,19 @@ export default function GuestbookPage() {
                     rows={3}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Tuliskan ucapan tahniah, doa keberkatan, atau memori bersama pasangan..."
+                    placeholder={t.wishesPlaceholder}
                     maxLength={2000}
                     className="w-full px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-champagne-400 text-[16px] sm:text-sm resize-none"
                   />
                   <span className="text-[10px] text-right text-warm-400">
-                    {message.length} / 2000 aksara
+                    {message.length} / 2000 {t.charsCount}
                   </span>
                 </div>
 
                 {/* Field 3: Photo Upload with 4 Filters & Optional Cute Frames */}
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-semibold uppercase tracking-wider text-warm-700">
-                    Gambar / Selfie (Pilihan)
+                    {t.photoLabel}
                   </span>
 
                   {rawPhotoBase64 ? (
@@ -556,7 +564,7 @@ export default function GuestbookPage() {
                             <button
                               type="button"
                               onClick={removePhoto}
-                              aria-label="Padam gambar"
+                              aria-label={t.removePhoto}
                               className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 hover:bg-rose-600 text-white transition shadow-md z-20"
                             >
                               <X className="w-4 h-4" />
@@ -595,7 +603,7 @@ export default function GuestbookPage() {
                         className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl border border-champagne-300 bg-gradient-to-r from-amber-50 via-champagne-50 to-rose-50 hover:from-amber-100 hover:to-rose-100 text-champagne-950 font-bold text-xs shadow-xs transition active:scale-[0.98] group"
                       >
                         <Sparkles className="w-4 h-4 text-champagne-700 group-hover:rotate-12 transition-transform" />
-                        <span>✨ Ambil Strip Photobooth (5 Gaya Pilihan)</span>
+                        <span>{t.photoboothModalBtn}</span>
                       </button>
 
                       <div className="grid grid-cols-2 gap-2.5">
@@ -629,7 +637,7 @@ export default function GuestbookPage() {
                           <div className="w-8 h-8 rounded-full bg-champagne-100 group-hover:bg-champagne-200 flex items-center justify-center text-champagne-700 transition">
                             <Camera className="w-4 h-4" />
                           </div>
-                          <span className="text-xs font-medium">Selfie</span>
+                          <span className="text-xs font-medium">{t.selfieBtn}</span>
                         </button>
 
                         <button
@@ -640,7 +648,7 @@ export default function GuestbookPage() {
                           <div className="w-8 h-8 rounded-full bg-warm-200 flex items-center justify-center text-warm-700 transition">
                             <ImageIcon className="w-4 h-4" />
                           </div>
-                          <span className="text-xs font-medium">Pilih Gambar</span>
+                          <span className="text-xs font-medium">{t.choosePhotoBtn}</span>
                         </button>
                       </div>
                     </div>
@@ -661,12 +669,12 @@ export default function GuestbookPage() {
                   {isSubmitting ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Menyimpan memori...</span>
+                      <span>{t.submittingBtn}</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4 fill-current" />
-                      <span>Hantar Ucapan</span>
+                      <span>{t.submitBtn}</span>
                     </>
                   )}
                 </button>

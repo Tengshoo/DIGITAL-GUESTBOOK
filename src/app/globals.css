@@ -14,8 +14,9 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  scroll-behavior: smooth;
-  overscroll-behavior-y: none;
+  overflow-x: clip;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -30,7 +31,9 @@ body {
   padding: 0;
   width: 100%;
   position: relative;
-  overscroll-behavior-y: none;
+  overflow-x: clip;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Safe area padding utilities for iOS Notch / Dynamic Island & Home indicator */

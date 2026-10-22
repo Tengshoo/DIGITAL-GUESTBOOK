@@ -166,7 +166,7 @@ export const PHOTOBOOTH_STRIP_THEMES: PhotoboothStripTheme[] = [
     bgColor: '#FFFBF7',
     textColor: '#4A3B32',
     accentColor: '#D97706',
-    tagline: 'romantic wedding memories • atif & isma',
+    tagline: 'romantic engagement memories • atif & isma',
     slots: [
       {
         id: 'slot-1',

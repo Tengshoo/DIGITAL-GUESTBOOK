@@ -21,6 +21,7 @@ import { PHOTOBOOTH_STRIP_THEMES, PhotoboothStripTheme } from './stripThemes';
 import PhotoboothStripView from './PhotoboothStripView';
 import { generatePhotoboothStripCanvas, downloadStripImage, EventInfo } from '@/lib/photoboothCanvas';
 import { PHOTO_FILTERS, PhotoFilter } from '@/components/PhotoFilterSelector';
+import { useLanguage } from '@/lib/i18n';
 
 interface PhotoboothStudioProps {
   onAttachToGuestbook?: (stripDataUrl: string) => void;
@@ -34,13 +35,15 @@ export default function PhotoboothStudio({
   onClose,
   eventInfo = {
     welcomeTitle: 'Atif & Isma',
-    miniTitle: 'Majlis Perkahwinan',
+    miniTitle: 'Majlis Pertunangan',
     date: '08 Jul 2026',
     venue: 'OneTwoKL',
     hashtag: '#AtifIsma',
   },
   isModal = false,
 }: PhotoboothStudioProps) {
+  const { language, t } = useLanguage();
+
   // State
   const [photos, setPhotos] = useState<string[]>([]);
   const [activeSlot, setActiveSlot] = useState<number>(0);
@@ -480,14 +483,14 @@ export default function PhotoboothStudio({
           <div>
             <div className="flex items-center gap-1.5">
               <h2 className="font-serif font-bold text-lg sm:text-xl text-warm-900">
-                Photobooth Studio
+                {t.photoboothTitle}
               </h2>
               <span className="px-2 py-0.5 rounded-full bg-champagne-100 text-champagne-800 text-[10px] font-bold uppercase tracking-wider">
-                5 Strips
+                6 Strips
               </span>
             </div>
             <p className="text-xs text-warm-600">
-              Rakam momen indah atau pilih gambar untuk strip kenangan anda.
+              {t.photoboothSubtitle}
             </p>
           </div>
         </div>
@@ -497,7 +500,7 @@ export default function PhotoboothStudio({
             type="button"
             onClick={onClose}
             className="p-2 rounded-full bg-warm-100 hover:bg-warm-200 text-warm-700 transition"
-            title="Tutup Studio"
+            title={language === 'ms' ? 'Tutup Studio' : 'Close Studio'}
           >
             <X className="w-5 h-5" />
           </button>
@@ -542,10 +545,10 @@ export default function PhotoboothStudio({
                   <Camera className="w-5 h-5 text-champagne-300 absolute inset-0 m-auto" />
                 </div>
                 <p className="font-serif italic text-base text-warm-100 mb-1">
-                  Menyambungkan Kamera...
+                  {t.cameraConnecting}
                 </p>
                 <p className="text-xs text-warm-300/80 max-w-xs">
-                  Sila benarkan akses kamera pelayar anda untuk memulakan photobooth.
+                  {t.cameraPermissionNote}
                 </p>
               </div>
             )}
@@ -555,13 +558,13 @@ export default function PhotoboothStudio({
               <div className="absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center text-center p-6 text-warm-300 z-20 animate-fade-in">
                 <Camera className="w-12 h-12 mb-3 text-champagne-400 opacity-60" />
                 <p className="font-serif italic text-base text-warm-100 mb-2">
-                  Kamera Belum Aktif
+                  {t.cameraInactive}
                 </p>
                 {cameraError ? (
                   <p className="text-xs text-rose-300 max-w-xs mb-4">{cameraError}</p>
                 ) : (
                   <p className="text-xs text-warm-300/80 max-w-xs mb-4">
-                    Sila aktifkan kamera pelayar anda atau muat naik foto dari galeri.
+                    {t.cameraPermissionNote}
                   </p>
                 )}
                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -570,14 +573,14 @@ export default function PhotoboothStudio({
                     onClick={startCamera}
                     className="px-4 py-2 rounded-xl bg-champagne-500 hover:bg-champagne-600 text-warm-950 font-semibold text-xs transition shadow-md active:scale-95"
                   >
-                    Hidupkan Kamera
+                    {t.enableCameraBtn}
                   </button>
                   <button
                     type="button"
                     onClick={() => fileUploadRef.current?.click()}
                     className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white font-medium text-xs transition border border-white/30 active:scale-95"
                   >
-                    Pilih Dari Galeri
+                    {t.chooseGalleryBtn}
                   </button>
                 </div>
               </div>
@@ -588,12 +591,12 @@ export default function PhotoboothStudio({
               <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10 animate-fade-in">
                 <div className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-[11px] font-medium text-warm-200 flex items-center gap-1.5 shadow-xs">
                   <Camera className="w-3 h-3 text-champagne-400" />
-                  <span>{facingMode === 'user' ? 'Kamera Depan' : 'Kamera Belakang'}</span>
+                  <span>{facingMode === 'user' ? t.frontCamera : t.rearCamera}</span>
                 </div>
 
                 <div className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-[11px] font-medium text-emerald-300 flex items-center gap-1.5 shadow-xs">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Langsung</span>
+                  <span>{t.liveBadge}</span>
                 </div>
               </div>
             )}
@@ -605,7 +608,7 @@ export default function PhotoboothStudio({
                   {countdown}
                 </span>
                 <span className="text-sm font-sans tracking-widest uppercase font-semibold text-warm-200 mt-4">
-                  Sedia untuk bergaya! 📸
+                  {t.readyToPose}
                 </span>
               </div>
             )}
@@ -632,10 +635,10 @@ export default function PhotoboothStudio({
                   onClick={toggleCamera}
                   disabled={isFlipping || isCameraLoading}
                   className="pointer-events-auto p-2.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-md transition-all active:scale-90 disabled:opacity-50 flex items-center gap-1.5"
-                  title="Tukar Kamera Depan/Belakang"
+                  title={t.switchLens}
                 >
                   <SwitchCamera className={`w-4 h-4 text-champagne-300 transition-transform duration-300 ${isFlipping ? 'rotate-180' : ''}`} />
-                  <span className="text-[11px] font-medium hidden sm:inline">Tukar Lensa</span>
+                  <span className="text-[11px] font-medium hidden sm:inline">{t.switchLens}</span>
                 </button>
 
                 {/* Upload single slot file */}
@@ -645,7 +648,7 @@ export default function PhotoboothStudio({
                   className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-xs font-medium border border-white/20 shadow-md transition active:scale-95"
                 >
                   <ImageIcon className="w-3.5 h-3.5 text-champagne-300" />
-                  <span>Pilih Galeri</span>
+                  <span>{t.chooseGalleryBtn}</span>
                 </button>
               </div>
             )}
@@ -663,8 +666,8 @@ export default function PhotoboothStudio({
               <Play className="w-4 h-4 fill-warm-950" />
               <span>
                 {isAutoShooting
-                  ? `Mengambil Gambar (${autoShootStep}/${slotCount})...`
-                  : `Mula Auto-Booth (${slotCount} Shots)`}
+                  ? `${t.takingShot} (${autoShootStep}/${slotCount})...`
+                  : t.startAutoBooth.replace('{count}', String(slotCount))}
               </span>
             </button>
 
@@ -676,20 +679,22 @@ export default function PhotoboothStudio({
               className="w-full sm:w-auto py-3.5 px-5 rounded-2xl bg-white hover:bg-warm-50 border border-warm-200 text-warm-800 font-semibold text-sm transition shadow-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Camera className="w-4 h-4 text-champagne-600" />
-              <span>Ambil Slot {activeSlot + 1}</span>
+              <span>{t.takeSlot.replace('{slot}', String(activeSlot + 1))}</span>
             </button>
           </div>
 
           {/* Strip Info Bar */}
           <div className="flex items-center justify-between p-3 rounded-2xl bg-white/80 border border-warm-200/80 shadow-soft">
             <span className="text-xs font-semibold text-warm-700 flex items-center gap-1.5">
-              <span>Format Strip Aktif:</span>
+              <span>{t.activeFormat}</span>
               <span className="px-2 py-0.5 rounded-full bg-champagne-100 text-champagne-800 text-[11px] font-bold">
-                {slotCount} Cuts Layout
+                {t.cutsLayout.replace('{count}', String(slotCount))}
               </span>
             </span>
             <span className="text-[11px] font-mono text-warm-500">
-              {photos.filter(Boolean).length}/{slotCount} gambar
+              {t.photosCount
+                .replace('{current}', String(photos.filter(Boolean).length))
+                .replace('{total}', String(slotCount))}
             </span>
           </div>
 
@@ -698,9 +703,9 @@ export default function PhotoboothStudio({
             <div className="flex items-center justify-between text-xs text-warm-700">
               <span className="font-bold flex items-center gap-1.5">
                 <Wand2 className="w-3.5 h-3.5 text-champagne-600" />
-                <span>Pilih Koleksi Strip Photobooth (6 Pilihan)</span>
+                <span>{t.chooseCollection}</span>
               </span>
-              <span className="text-[11px] text-warm-500">Sentuh untuk tukar</span>
+              <span className="text-[11px] text-warm-500">{t.tapToChange}</span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -749,7 +754,7 @@ export default function PhotoboothStudio({
           {/* Photo Filters Bar */}
           <div className="flex flex-col gap-2 pt-1">
             <span className="text-xs font-semibold text-warm-700">
-              Penapis Warna Gambar (Filter)
+              {language === 'ms' ? 'Penapis Warna Gambar (Filter)' : 'Photo Color Filters'}
             </span>
             <div className="grid grid-cols-4 gap-2">
               {PHOTO_FILTERS.map((f) => {
@@ -777,7 +782,7 @@ export default function PhotoboothStudio({
         <div className="lg:col-span-5 flex flex-col items-center gap-4 bg-warm-50/70 p-4 sm:p-5 rounded-3xl border border-warm-200/80">
           <div className="w-full flex items-center justify-between pb-2 border-b border-warm-200/60">
             <span className="text-xs font-bold uppercase tracking-wider text-warm-700 flex items-center gap-1.5">
-              <span>Pratonton Strip</span>
+              <span>{language === 'ms' ? 'Pratonton Strip' : 'Strip Preview'}</span>
               <span className="text-[10px] font-normal lowercase text-warm-400">
                 (live preview)
               </span>
@@ -790,7 +795,7 @@ export default function PhotoboothStudio({
                 className="text-[11px] font-medium text-rose-600 hover:text-rose-800 flex items-center gap-1 transition"
               >
                 <RotateCcw className="w-3 h-3" />
-                <span>Mula Semula</span>
+                <span>{language === 'ms' ? 'Mula Semula' : 'Reset All'}</span>
               </button>
             )}
           </div>
@@ -820,12 +825,12 @@ export default function PhotoboothStudio({
               {isExporting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Menjana Strip HD...</span>
+                  <span>{language === 'ms' ? 'Menjana Strip HD...' : 'Generating HD Strip...'}</span>
                 </>
               ) : (
                 <>
                   <Download className="w-4 h-4" />
-                  <span>Muat Turun Strip Photobooth</span>
+                  <span>{t.downloadStrip}</span>
                 </>
               )}
             </button>
@@ -839,7 +844,7 @@ export default function PhotoboothStudio({
                 className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-warm-100 border border-warm-200 text-warm-900 font-semibold text-xs transition shadow-sm active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2"
               >
                 <Heart className="w-3.5 h-3.5 text-rose-500 fill-current" />
-                <span>Guna Strip Ini Dalam Buku Tetamu</span>
+                <span>{t.attachToGuestbook}</span>
               </button>
             )}
           </div>

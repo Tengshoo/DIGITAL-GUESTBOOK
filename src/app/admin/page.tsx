@@ -277,7 +277,7 @@ export default function AdminDashboardPage() {
             Guestbook Moderation
           </h1>
           <p className="text-xs sm:text-sm text-warm-600">
-            Review guest submissions, curate the live projector feed, and backup wedding notes.
+            Review guest submissions, curate the live projector feed, and backup engagement celebration notes.
           </p>
         </div>
 
