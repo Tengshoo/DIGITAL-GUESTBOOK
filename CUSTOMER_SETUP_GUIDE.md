@@ -46,8 +46,7 @@ export const EVENT_CONFIG = {
   images: {
     // Couple portrait avatar (circular image on cover)
     avatar: '/assets/img/customer-avatar.jpg',
-    // Background venue image (full-bleed cinematic cover photo)
-    // Background venue image (full-bleed cinematic cover photo)
+    // Background venue image (full-bleed cinematic photo for Home & Live Wall)
     background: '/assets/img/customer-venue.jpg',
   },
 
@@ -80,7 +79,7 @@ Save the customer's two cover images inside the [`public/assets/img/`](file:///p
 | Image Asset | Recommended Specs | Purpose |
 | :--- | :--- | :--- |
 | **Avatar Photo** (`avatar`) | `800 x 800 px` (1:1 Square/Circle), JPG or PNG | Circular portrait of the couple on the front cover. |
-| **Backdrop Image** (`background`) | `1920 x 1080 px` (16:9 Landscape) or `1080 x 1920 px` (Portrait), JPG | Full-bleed cinematic venue/wedding background photo. |
+| **Backdrop Image** (`background`) | `1920 x 1080 px` (16:9 Landscape) or `1080 x 1920 px` (Portrait), JPG | Full-bleed cinematic venue background photo applied to **both Home Cover (`/`) and Live Wall (`/wall`)** with automatic contrast vignette. |
 
 > **Pro Tip**: Use compressed JPG or WebP images under **1MB** each to ensure instantaneous loading on mobile data at the wedding venue.
 
@@ -130,6 +129,14 @@ supabase: {
 
 > **Note**: If a VIP or corporate client ever requires their own dedicated Supabase database project for data compliance, you can simply paste their new project's `url` and `anonKey` into `eventConfig.ts`.
 
+### ⚙️ One-Time Supabase Setup (Only needed once on your main project)
+In your Supabase project's **SQL Editor**, run [`supabase_schema.sql`](file:///supabase_schema.sql) (or run this quick command to ensure error-free moderation):
+```sql
+-- Ensure event_id exists and disable RLS so /admin can approve/hide without restriction
+alter table public.entries add column if not exists event_id text default 'default';
+alter table public.entries disable row level security;
+```
+
 ---
 
 ## 🧪 Step 5: Test & Verify Locally
@@ -143,25 +150,31 @@ npm run dev
 
 Visit the following pages in your browser:
 * **Home Page**: `http://localhost:3000/` ➔ Verify names, date, venue, hashtag, and couple photo.
-* **Photobooth Studio**: `http://localhost:3000/photobooth` ➔ Snap test photos and verify strip rendering.
-* **Live Wall**: `http://localhost:3000/wall` ➔ Check the projector view and toggle the 2xN mobile grid.
-* **Admin Dashboard**: `http://localhost:3000/admin` ➔ Enter PIN (default `1234`), verify entries moderation, and test the **Google Drive** folder link button.
+* **Photobooth Studio**: `http://localhost:3000/photobooth` ➔ Snap test photos and verify strip rendering & downloads.
+* **Live Wall**: `http://localhost:3000/wall` ➔ Check the projector view, verify the venue background photo, and test the 2xN mobile grid toggle.
+* **Admin Dashboard**: `http://localhost:3000/admin` ➔ Enter PIN (default `1234`), test hiding/approving entries, delete test wishes, and click the **Google Drive** folder shortcut button.
 
 ---
 
-## 🚀 Step 6: Build & Deploy to Production
+## 🚀 Step 6: Build & Deploy to Production (GitHub Pages)
 
-Once verified, compile the production build:
-
+### 1. Build & Push Code:
 ```bash
-# Build the optimized static bundle
+# 1. Build the optimized static bundle
 npm run build
 
-# Commit and push to GitHub (triggers automated deployment)
+# 2. Commit and push to GitHub
 git add .
 git commit -m "chore: setup event for [Customer Name]"
 git push origin main
 ```
+
+### 2. Configure GitHub Pages (In your GitHub Repository):
+1. Go to your repository on GitHub.
+2. Click **Settings** ➔ **Pages** (in the left sidebar).
+3. Under **Build and deployment > Source**, select: **GitHub Actions**.
+4. (Optional) If using a custom subdomain (e.g. `clientname.memoira.art`), enter it under **Custom domain** and save.
+5. GitHub Actions will build and deploy the website automatically within 60 seconds!
 
 ---
 
@@ -171,9 +184,11 @@ git push origin main
 - [ ] Updated Event Type (Wedding / Engagement / Reception)
 - [ ] Updated Event Date (English, Malay, Numeric)
 - [ ] Updated Venue Location & Hashtag
-- [ ] Added Couple Avatar & Venue Backdrop into `public/assets/img/`
+- [ ] Added Couple Avatar & Venue Backdrop into `public/assets/img/` (Applies to both Home & Live Wall)
 - [ ] Set Unique Supabase `eventId` (e.g. `'aiman-dahlia'`) in `src/config/eventConfig.ts`
-- [ ] Configured Customer Google Drive Folder ID & Script URL
+- [ ] Configured Customer Google Drive Folder ID & Script URL in Apps Script & `eventConfig.ts`
 - [ ] Set Host Admin PIN (Shared with the client/emcee)
+- [ ] Verified Live Wall (`/wall`) displays venue background & QR code
+- [ ] Tested Admin (`/admin`) hide/delete moderation and CSV export
 - [ ] Ran `npm run build` with 0 errors
-- [ ] Pushed to Git & verified live site
+- [ ] Pushed to GitHub & verified live deployment on GitHub Pages
