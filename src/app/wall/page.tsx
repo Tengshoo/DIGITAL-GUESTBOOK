@@ -20,6 +20,8 @@ import {
 import Link from 'next/link';
 import AudioPlayer from '@/components/AudioPlayer';
 import { getApprovedEntries, getSupabase } from '@/lib/supabase';
+import { EVENT_CONFIG } from '@/config/eventConfig';
+import { getAssetPath } from '@/lib/assets';
 
 interface GuestEntry {
   id: number;
@@ -197,21 +199,31 @@ export default function WallModePage() {
     }
   };
 
+  const bgImage = getAssetPath(EVENT_CONFIG.images.background);
+
   return (
     <div
-      className={`relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-between overflow-x-hidden bg-[#181310] text-[#FAF8F5] select-none transition-all pb-[env(safe-area-inset-bottom,0px)] ${
+      className={`relative w-full min-h-screen min-h-[100dvh] flex flex-col justify-between overflow-x-hidden bg-[#140f0c] text-[#FAF8F5] select-none transition-all pb-[env(safe-area-inset-bottom,0px)] ${
         isFullscreen ? 'fixed inset-0 z-50 p-3 sm:p-8' : 'p-3 sm:p-8'
       }`}
-      style={{
-        backgroundImage: `
-          radial-gradient(ellipse at 20% 20%, rgba(197, 161, 82, 0.18) 0%, transparent 60%),
-          radial-gradient(ellipse at 80% 80%, rgba(220, 84, 108, 0.14) 0%, transparent 60%),
-          radial-gradient(ellipse at 50% 50%, rgba(35, 24, 15, 0.95) 0%, rgba(18, 13, 10, 0.98) 100%)
-        `,
-      }}
     >
-      {/* Background Animated Bokeh Sparks */}
-      <div className="absolute inset-0 pointer-events-none opacity-30">
+      {/* 1. Full-Bleed Cinematic Background Image Matching Main Page */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={bgImage}
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover object-center select-none pointer-events-none scale-105"
+          loading="eager"
+          decoding="async"
+        />
+        {/* Dark Vignette Overlay for Crisp Readability on Projectors & Screens */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/55 to-black/85" />
+      </div>
+
+      {/* 2. Background Animated Bokeh Sparks */}
+      <div className="absolute inset-0 pointer-events-none opacity-20 z-0">
         <div className="absolute top-1/4 left-1/6 w-64 h-64 rounded-full bg-champagne-400/20 blur-3xl animate-float-gentle" />
         <div className="absolute bottom-1/3 right-1/6 w-72 h-72 rounded-full bg-rose-500/15 blur-3xl animate-float-gentle" style={{ animationDelay: '3s' }} />
       </div>
