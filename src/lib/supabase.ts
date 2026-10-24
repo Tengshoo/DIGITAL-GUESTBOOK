@@ -213,7 +213,7 @@ export async function getAllEntriesForAdmin(): Promise<SupabaseGuestEntry[]> {
 export async function updateEntryApproval(
   id: number,
   isApproved: number
-): Promise<boolean> {
+): Promise<{ success: boolean; error?: string }> {
   const supabase = getSupabase();
 
   if (supabase) {
@@ -221,7 +221,11 @@ export async function updateEntryApproval(
       .from('entries')
       .update({ is_approved: isApproved })
       .eq('id', id);
-    return !error;
+    if (error) {
+      console.error('Supabase update error:', error);
+      return { success: false, error: error.message };
+    }
+    return { success: true };
   }
 
   const current = getLocalEntries();
@@ -229,22 +233,28 @@ export async function updateEntryApproval(
     e.id === id ? { ...e, is_approved: isApproved } : e
   );
   saveLocalEntries(updated);
-  return true;
+  return { success: true };
 }
 
 /**
  * Delete an entry
  */
-export async function deleteGuestEntry(id: number): Promise<boolean> {
+export async function deleteGuestEntry(
+  id: number
+): Promise<{ success: boolean; error?: string }> {
   const supabase = getSupabase();
 
   if (supabase) {
     const { error } = await supabase.from('entries').delete().eq('id', id);
-    return !error;
+    if (error) {
+      console.error('Supabase delete error:', error);
+      return { success: false, error: error.message };
+    }
+    return { success: true };
   }
 
   const current = getLocalEntries();
   const updated = current.filter((e) => e.id !== id);
   saveLocalEntries(updated);
-  return true;
+  return { success: true };
 }

@@ -105,9 +105,9 @@ export default function AdminDashboardPage() {
   const toggleApproval = async (id: number, currentStatus: number) => {
     try {
       const newStatus = currentStatus === 1 ? 0 : 1;
-      const success = await updateEntryApproval(id, newStatus);
-      if (!success) {
-        throw new Error('Gagal mengemaskini status entri.');
+      const res = await updateEntryApproval(id, newStatus);
+      if (!res.success) {
+        throw new Error(res.error || 'Gagal mengemaskini status entri.');
       }
 
       setEntries((prev) =>
@@ -127,9 +127,9 @@ export default function AdminDashboardPage() {
     if (!confirmDelete) return;
 
     try {
-      const success = await deleteGuestEntry(id);
-      if (!success) {
-        throw new Error('Gagal memadamkan entri');
+      const res = await deleteGuestEntry(id);
+      if (!res.success) {
+        throw new Error(res.error || 'Gagal memadamkan entri');
       }
 
       setEntries((prev) => prev.filter((e) => e.id !== id));

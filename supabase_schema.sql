@@ -24,32 +24,48 @@ create table if not exists public.entries (
 alter table public.entries add column if not exists event_id text default 'default';
 create index if not exists idx_entries_event_id on public.entries(event_id);
 
--- 2. Enable Realtime updates for the Live Wall
+-- 2. Grant permissions to anon and authenticated roles
+grant all on table public.entries to anon, authenticated;
+grant usage, select on all sequences in schema public to anon, authenticated;
+
+-- 3. Enable Realtime updates for the Live Wall
 alter publication supabase_realtime add table public.entries;
 
--- 3. Enable Row Level Security (RLS)
+-- 4. Enable Row Level Security (RLS)
 alter table public.entries enable row level security;
 
--- 4. Create Policies
+-- Drop old policies if they exist
+drop policy if exists "Allow reading approved entries" on public.entries;
+drop policy if exists "Allow public submissions" on public.entries;
+drop policy if exists "Allow updates for moderation" on public.entries;
+drop policy if exists "Allow deletions for moderation" on public.entries;
+drop policy if exists "Allow select entries" on public.entries;
+drop policy if exists "Allow insert entries" on public.entries;
+drop policy if exists "Allow update entries" on public.entries;
+drop policy if exists "Allow delete entries" on public.entries;
+
+-- 5. Create Policies
+-- Allow reading entries (Home and Live Wall query only approved entries with .eq('is_approved', 1), while Admin queries all)
+create policy "Allow select entries"
+  on public.entries
+  for select
+  using (true);
+
 -- Allow any guest to submit their wishes, photos, and voice notes
-create policy "Allow public submissions"
+create policy "Allow insert entries"
   on public.entries
   for insert
   with check (true);
 
--- Allow anyone to view approved memories on the Live Wall & Home
-create policy "Allow reading approved entries"
-  on public.entries
-  for select
-  using (is_approved = 1);
-
--- Allow moderation (approve/hide/delete)
-create policy "Allow updates for moderation"
+-- Allow moderation (approve/hide)
+create policy "Allow update entries"
   on public.entries
   for update
-  using (true);
+  using (true)
+  with check (true);
 
-create policy "Allow deletions for moderation"
+-- Allow deletion for moderation
+create policy "Allow delete entries"
   on public.entries
   for delete
   using (true);
