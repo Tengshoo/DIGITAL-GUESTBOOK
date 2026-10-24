@@ -28,7 +28,7 @@ import PhotoFrameSelector, {
   applyFilterAndFrameToCanvas,
 } from '@/components/PhotoFrameSelector';
 import PhotoboothStudio from '@/components/Photobooth/PhotoboothStudio';
-import { submitGuestbookEntry } from '@/lib/supabase';
+import { submitGuestbookEntry, isPhotoUploadAllowed } from '@/lib/supabase';
 import { uploadPhotoToGoogleDrive } from '@/lib/googleDrive';
 import { getAssetPath } from '@/lib/assets';
 import { useLanguage, LanguageToggle } from '@/lib/i18n';
@@ -58,12 +58,28 @@ export default function GuestbookPage() {
   const [selectedFrame, setSelectedFrame] = useState<PhotoFrameConfig['id']>('none');
   const [voiceBase64, setVoiceBase64] = useState<string | null>(null);
 
+  // Photo upload limit status
+  const [photoLimitStatus, setPhotoLimitStatus] = useState<{
+    allowed: boolean;
+    currentCount: number;
+    limit: number;
+  }>({
+    allowed: true,
+    currentCount: 0,
+    limit: EVENT_CONFIG.photoUploadLimit || 500,
+  });
+
   // Modal / Drawer toggle
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isPhotoboothModalOpen, setIsPhotoboothModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Check photo upload limit when modal opens
+  useEffect(() => {
+    isPhotoUploadAllowed().then(setPhotoLimitStatus).catch(() => {});
+  }, [isFormOpen, isPhotoboothModalOpen]);
 
   // Close modals on Escape key press (Desktop / Hardware keyboard optimization)
   useEffect(() => {
@@ -105,6 +121,15 @@ export default function GuestbookPage() {
   }, []);
 
   const handlePhotoboothComplete = (stripDataUrl: string) => {
+    if (!photoLimitStatus.allowed) {
+      alert(
+        language === 'ms'
+          ? `Had muat naik foto sebanyak ${photoLimitStatus.limit} keping telah dicapai. Anda tetap boleh memuat turun strip foto ke peranti!`
+          : `Photo upload limit of ${photoLimitStatus.limit} has been reached. You can still download your photobooth strip to your device!`
+      );
+      setIsPhotoboothModalOpen(false);
+      return;
+    }
     setRawPhotoBase64(stripDataUrl);
     setPhotoBase64(stripDataUrl);
     setSelectedFilter('original');
@@ -115,6 +140,15 @@ export default function GuestbookPage() {
 
   // Photo upload handling & client-side compression
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!photoLimitStatus.allowed) {
+      setErrorMsg(
+        language === 'ms'
+          ? `Had muat naik foto sebanyak ${photoLimitStatus.limit} keping telah dicapai. Anda dialu-alukan menghantar ucapan teks & nota suara!`
+          : `Photo upload limit of ${photoLimitStatus.limit} has been reached. You can still send text wishes & voice notes!`
+      );
+      return;
+    }
+
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -603,6 +637,22 @@ export default function GuestbookPage() {
                         selectedFrame={selectedFrame}
                         onSelectFrame={(fId) => setSelectedFrame(fId)}
                       />
+                    </div>
+                  ) : !photoLimitStatus.allowed ? (
+                    <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 text-xs flex items-center gap-3">
+                      <Sparkles className="w-5 h-5 text-amber-600 shrink-0" />
+                      <div>
+                        <p className="font-semibold text-amber-950">
+                          {language === 'ms'
+                            ? `Had Muat Naik Foto Telah Dicapai (${photoLimitStatus.currentCount}/${photoLimitStatus.limit})`
+                            : `Photo Upload Limit Reached (${photoLimitStatus.currentCount}/${photoLimitStatus.limit})`}
+                        </p>
+                        <p className="text-[11px] text-amber-800/90 mt-0.5 leading-snug">
+                          {language === 'ms'
+                            ? 'Muat naik foto kini ditutup untuk acara ini. Anda tetap dialu-alukan menghantar ucapan teks & nota suara!'
+                            : 'Photo uploads are now closed for this event. You are still warmly invited to send text wishes & voice notes!'}
+                        </p>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2.5">

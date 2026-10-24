@@ -96,6 +96,52 @@ function saveLocalEntries(entries: SupabaseGuestEntry[]) {
 }
 
 /**
+ * Get total count of photo uploads for the current event
+ */
+export async function getPhotoUploadCount(): Promise<number> {
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      let query = supabase
+        .from('entries')
+        .select('*', { count: 'exact', head: true })
+        .not('photo_url', 'is', null);
+
+      if (currentEventId) {
+        query = query.eq('event_id', currentEventId);
+      }
+
+      const { count, error } = await query;
+      if (!error && typeof count === 'number') {
+        return count;
+      }
+    } catch (err) {
+      console.error('Failed to get photo upload count from Supabase:', err);
+    }
+  }
+
+  const local = getLocalEntries();
+  return local.filter((e) => e.photo_url && e.photo_url.trim().length > 0).length;
+}
+
+/**
+ * Check if photo upload is currently permitted for this event
+ */
+export async function isPhotoUploadAllowed(): Promise<{
+  allowed: boolean;
+  currentCount: number;
+  limit: number;
+}> {
+  const limit = EVENT_CONFIG.photoUploadLimit ?? 500;
+  const currentCount = await getPhotoUploadCount();
+  return {
+    allowed: currentCount < limit,
+    currentCount,
+    limit,
+  };
+}
+
+/**
  * Submit a new guestbook memory
  */
 export async function submitGuestbookEntry(entry: {
@@ -104,6 +150,17 @@ export async function submitGuestbookEntry(entry: {
   photo_url?: string | null;
   audio_url?: string | null;
 }): Promise<{ success: boolean; error?: string }> {
+  // Enforce photo upload limit if a photo is attached
+  if (entry.photo_url && entry.photo_url.trim().length > 0) {
+    const { allowed, currentCount, limit } = await isPhotoUploadAllowed();
+    if (!allowed) {
+      return {
+        success: false,
+        error: `Had muat naik foto sebanyak ${limit} keping telah dicapai (${currentCount}/${limit}). Anda tetap dialu-alukan menghantar ucapan teks & nota suara!`,
+      };
+    }
+  }
+
   const supabase = getSupabase();
 
   if (supabase) {

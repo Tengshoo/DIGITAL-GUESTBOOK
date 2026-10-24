@@ -376,11 +376,25 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="bg-white/80 p-4 rounded-2xl border border-warm-200/80 shadow-soft">
-          <span className="text-[11px] uppercase tracking-wider font-semibold text-champagne-700">
-            With Photos
-          </span>
-          <p className="font-serif text-2xl sm:text-3xl font-bold text-champagne-800 mt-1">
-            {photoCount}
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] uppercase tracking-wider font-semibold text-champagne-700">
+              Photo Uploads
+            </span>
+            <span
+              className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                photoCount >= (EVENT_CONFIG.photoUploadLimit || 500)
+                  ? 'bg-rose-100 text-rose-700'
+                  : 'bg-champagne-100 text-champagne-800'
+              }`}
+            >
+              Limit: {EVENT_CONFIG.photoUploadLimit || 500}
+            </span>
+          </div>
+          <p className="font-serif text-2xl sm:text-3xl font-bold text-champagne-800 mt-1 flex items-baseline gap-1">
+            <span>{photoCount}</span>
+            <span className="text-xs font-sans text-warm-500 font-normal">
+              / {EVENT_CONFIG.photoUploadLimit || 500}
+            </span>
           </p>
         </div>
 

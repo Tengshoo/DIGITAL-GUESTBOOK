@@ -6,6 +6,7 @@
  */
 
 import { EVENT_CONFIG } from '@/config/eventConfig';
+import { isPhotoUploadAllowed } from '@/lib/supabase';
 
 const GOOGLE_SCRIPT_URL =
   process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
@@ -47,6 +48,16 @@ export async function uploadPhotoToGoogleDrive({
   if (!isGoogleDriveConfigured()) {
     // Graceful no-op if Google Drive webhook is not yet configured
     return { success: true };
+  }
+
+  // Check event photo upload limit
+  const { allowed, currentCount, limit } = await isPhotoUploadAllowed();
+  if (!allowed) {
+    console.warn(`Photo upload limit reached (${currentCount}/${limit}). Skipping Google Drive upload.`);
+    return {
+      success: false,
+      error: `Had muat naik foto sebanyak ${limit} keping telah dicapai (${currentCount}/${limit}).`,
+    };
   }
 
   try {

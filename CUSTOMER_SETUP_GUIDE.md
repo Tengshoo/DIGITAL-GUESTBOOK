@@ -67,6 +67,9 @@ export const EVENT_CONFIG = {
 
   // 9. Host Admin PIN (For /admin moderation dashboard)
   adminPin: '1234',                // Give this PIN to the couple/emcee
+
+  // 10. Photo Upload Limit (Total allowed across Gallery, Selfie & Photobooth)
+  photoUploadLimit: 500,           // Change to any number (e.g. 100, 300, 500, 1000)
 };
 ```
 
@@ -106,7 +109,28 @@ Each customer should have their own private Google Drive folder where all their 
 
 ---
 
-## 🗄️ Step 4: Supabase Database (Do You Need a New Project? NO!)
+## 📸 Step 4: Photo Upload Limit Configuration
+
+By default, each event has a **500 photo upload limit** to protect your storage and keep the live wall running fast. This limit encompasses:
+* **Gallery Uploads** (guest uploads from mobile camera roll)
+* **Live Camera Selfies** (guest snaps with smartphone camera)
+* **Photobooth Strips** (strips created & submitted in Photobooth Studio)
+
+### How to adjust the limit:
+In [`src/config/eventConfig.ts`](file:///src/config/eventConfig.ts), change line 70:
+```typescript
+photoUploadLimit: 500, // Change anytime (e.g. 200, 300, 500, 1000)
+```
+
+### What happens when the limit is reached?
+* **Polite Notification**: Guests see a respectful banner: *"Photo upload limit of 500 has been reached. You are still warmly invited to send text wishes and voice notes!"*
+* **Wishes Never Blocked**: Guests can **always** continue submitting warm wishes and voice messages even after the photo limit is reached!
+* **Photobooth Keeps Working**: In Photobooth Studio, guests can still take fun pictures and download their strip to their phone!
+* **Admin Visibility**: The Host Admin dashboard ([`/admin`](file:///admin)) displays the live photo counter: e.g. **`Photo Uploads: 142 / 500`**.
+
+---
+
+## 🗄️ Step 5: Supabase Database (Do You Need a New Project? NO!)
 
 **Question**: *Do you need to create a brand new Supabase project for every customer repository?*
 **Answer**: **NO! You can use ONE single Supabase project across ALL your customer repositories.**
@@ -139,7 +163,7 @@ alter table public.entries disable row level security;
 
 ---
 
-## 🧪 Step 5: Test & Verify Locally
+## 🧪 Step 6: Test & Verify Locally
 
 In your terminal, test the customer's website before building:
 
@@ -152,11 +176,11 @@ Visit the following pages in your browser:
 * **Home Page**: `http://localhost:3000/` ➔ Verify names, date, venue, hashtag, and couple photo.
 * **Photobooth Studio**: `http://localhost:3000/photobooth` ➔ Snap test photos and verify strip rendering & downloads.
 * **Live Wall**: `http://localhost:3000/wall` ➔ Check the projector view, verify the venue background photo, and test the 2xN mobile grid toggle.
-* **Admin Dashboard**: `http://localhost:3000/admin` ➔ Enter PIN (default `1234`), test hiding/approving entries, delete test wishes, and click the **Google Drive** folder shortcut button.
+* **Admin Dashboard**: `http://localhost:3000/admin` ➔ Enter PIN (default `1234`), check the Photo Uploads counter (`X / 500`), test hiding/approving entries, delete test wishes, and click the **Google Drive** folder shortcut button.
 
 ---
 
-## 🚀 Step 6: Build & Deploy to Production (GitHub Pages)
+## 🚀 Step 7: Build & Deploy to Production (GitHub Pages)
 
 ### 1. Build & Push Code:
 ```bash
@@ -185,10 +209,11 @@ git push origin main
 - [ ] Updated Event Date (English, Malay, Numeric)
 - [ ] Updated Venue Location & Hashtag
 - [ ] Added Couple Avatar & Venue Backdrop into `public/assets/img/` (Applies to both Home & Live Wall)
+- [ ] Set Photo Upload Limit in `src/config/eventConfig.ts` (Default: `500`)
 - [ ] Set Unique Supabase `eventId` (e.g. `'aiman-dahlia'`) in `src/config/eventConfig.ts`
 - [ ] Configured Customer Google Drive Folder ID & Script URL in Apps Script & `eventConfig.ts`
 - [ ] Set Host Admin PIN (Shared with the client/emcee)
 - [ ] Verified Live Wall (`/wall`) displays venue background & QR code
-- [ ] Tested Admin (`/admin`) hide/delete moderation and CSV export
+- [ ] Tested Admin (`/admin`) photo counter, hide/delete moderation and CSV export
 - [ ] Ran `npm run build` with 0 errors
 - [ ] Pushed to GitHub & verified live deployment on GitHub Pages

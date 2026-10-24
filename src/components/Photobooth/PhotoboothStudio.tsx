@@ -25,6 +25,7 @@ import { uploadPhotoToGoogleDrive } from '@/lib/googleDrive';
 import { PHOTO_FILTERS, PhotoFilter } from '@/components/PhotoFilterSelector';
 import { useLanguage } from '@/lib/i18n';
 import { EVENT_CONFIG } from '@/config/eventConfig';
+import { isPhotoUploadAllowed } from '@/lib/supabase';
 
 interface PhotoboothStudioProps {
   onAttachToGuestbook?: (stripDataUrl: string) => void;
@@ -461,6 +462,18 @@ export default function PhotoboothStudio({
   // Attach strip directly to guestbook
   const handleAttach = async () => {
     if (photos.filter(Boolean).length === 0 || !onAttachToGuestbook) return;
+
+    // Check photo upload limit
+    const { allowed, limit } = await isPhotoUploadAllowed();
+    if (!allowed) {
+      alert(
+        language === 'ms'
+          ? `Had muat naik foto sebanyak ${limit} keping telah dicapai. Anda tetap boleh memuat turun strip foto ke peranti!`
+          : `Photo upload limit of ${limit} has been reached. You can still download your photobooth strip to your device!`
+      );
+      return;
+    }
+
     setIsExporting(true);
 
     try {
