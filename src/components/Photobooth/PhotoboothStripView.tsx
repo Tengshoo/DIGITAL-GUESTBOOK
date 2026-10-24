@@ -4,6 +4,7 @@ import React from 'react';
 import { PHOTOBOOTH_STRIP_THEMES, PhotoboothStripTheme, StripSlot } from './stripThemes';
 import { PHOTO_FILTERS } from '@/components/PhotoFilterSelector';
 import { Camera, Plus, RotateCcw, Sparkles } from 'lucide-react';
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 interface PhotoboothStripViewProps {
   photos: string[];
@@ -30,11 +31,11 @@ export default function PhotoboothStripView({
   onSelectSlot,
   onClearSlot,
   eventInfo = {
-    welcomeTitle: 'Atif & Isma',
-    miniTitle: 'Majlis Pertunangan',
-    date: '26 December 2026',
-    venue: 'OneTwoKL',
-    hashtag: '#AtifFoundIsma',
+    welcomeTitle: EVENT_CONFIG.title,
+    miniTitle: EVENT_CONFIG.eventType.ms,
+    date: EVENT_CONFIG.date.en,
+    venue: EVENT_CONFIG.venue,
+    hashtag: EVENT_CONFIG.hashtag,
   },
   compact = false,
 }: PhotoboothStripViewProps) {

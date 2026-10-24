@@ -28,6 +28,7 @@ import {
   deleteGuestEntry,
 } from '@/lib/supabase';
 import { getGoogleDriveFolderUrl } from '@/lib/googleDrive';
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 interface AdminEntry {
   id: number;
@@ -66,7 +67,8 @@ export default function AdminDashboardPage() {
     setIsLoading(true);
     setLoginError(null);
     try {
-      const correctPin = process.env.NEXT_PUBLIC_ADMIN_PIN || '2026';
+      const correctPin =
+        process.env.NEXT_PUBLIC_ADMIN_PIN || EVENT_CONFIG.adminPin || '1234';
       if (currentPin !== correctPin) {
         throw new Error('PIN keselamatan tidak sah.');
       }

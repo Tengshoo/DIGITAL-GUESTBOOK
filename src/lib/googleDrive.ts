@@ -5,10 +5,14 @@
  * via a free, lightweight Google Apps Script Web App.
  */
 
+import { EVENT_CONFIG } from '@/config/eventConfig';
+
 const GOOGLE_SCRIPT_URL =
   process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
-  'https://script.google.com/macros/s/AKfycbxmqBSEM_3emvagMiClkb9yN1VNalC7joWLkYymvi8fk14xq1SexXeeIs2JS88zX27-/exec';
-const GOOGLE_DRIVE_FOLDER_URL = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_URL || '';
+  EVENT_CONFIG.googleDrive.scriptUrl;
+const GOOGLE_DRIVE_FOLDER_URL =
+  process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_URL ||
+  EVENT_CONFIG.googleDrive.folderUrl;
 
 export function isGoogleDriveConfigured(): boolean {
   return typeof GOOGLE_SCRIPT_URL === 'string' && GOOGLE_SCRIPT_URL.trim().length > 0;

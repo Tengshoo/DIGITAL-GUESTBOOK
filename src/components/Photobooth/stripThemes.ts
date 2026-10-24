@@ -1,3 +1,5 @@
+import { EVENT_CONFIG } from '@/config/eventConfig';
+
 export interface StripSlot {
   id: string;
   x: number;
@@ -78,7 +80,7 @@ export const PHOTOBOOTH_STRIP_THEMES: PhotoboothStripTheme[] = [
     bgColor: '#FAF6EE',
     textColor: '#241D17',
     accentColor: '#EAB308',
-    tagline: 'sweetest memories together ♡ 26.12.2026',
+    tagline: `sweetest memories together ♡ ${EVENT_CONFIG.date.numeric}`,
     slots: [
       {
         id: 'slot-1',
@@ -221,7 +223,7 @@ export const PHOTOBOOTH_STRIP_THEMES: PhotoboothStripTheme[] = [
     bgColor: '#1A1817',
     textColor: '#F5F5F0',
     accentColor: '#E2E8F0',
-    tagline: 'RETRO DARKROOM PHOTO ARCHIVE // 26.12.26',
+    tagline: `RETRO DARKROOM PHOTO ARCHIVE // ${EVENT_CONFIG.date.numeric}`,
     slots: [
       {
         id: 'slot-1',

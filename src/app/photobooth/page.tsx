@@ -6,16 +6,17 @@ import { useRouter } from 'next/navigation';
 import { Sparkles, ArrowLeft, Tv, Heart, Camera } from 'lucide-react';
 import PhotoboothStudio from '@/components/Photobooth/PhotoboothStudio';
 import { useLanguage, LanguageToggle } from '@/lib/i18n';
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 export default function PhotoboothPage() {
   const router = useRouter();
   const { language, t } = useLanguage();
 
   const eventDetails = {
-    miniTitle: language === 'ms' ? 'Majlis Pertunangan' : 'Engagement Celebration',
-    welcomeTitle: 'Atif & Isma',
+    miniTitle: t.miniTitle,
+    welcomeTitle: EVENT_CONFIG.title,
     date: t.date,
-    venue: 'OneTwoKL',
+    venue: EVENT_CONFIG.venue,
     hashtag: t.hashtag,
   };
 

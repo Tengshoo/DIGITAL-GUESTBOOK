@@ -32,6 +32,7 @@ import { submitGuestbookEntry } from '@/lib/supabase';
 import { uploadPhotoToGoogleDrive } from '@/lib/googleDrive';
 import { getAssetPath } from '@/lib/assets';
 import { useLanguage, LanguageToggle } from '@/lib/i18n';
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 export default function GuestbookPage() {
   const { language, t } = useLanguage();
@@ -39,13 +40,13 @@ export default function GuestbookPage() {
   // Event details matching the demo
   const eventDetails = {
     miniTitle: t.miniTitle,
-    welcomeTitle: 'Atif & Isma',
+    welcomeTitle: EVENT_CONFIG.title,
     date: t.date,
     venue: t.venue,
     hashtag: t.hashtag,
     welcomeMessage: t.welcomeMessage,
-    bgImage: getAssetPath('/assets/img/arman-farah-venue.png?v=2'),
-    avatarImage: getAssetPath('/assets/img/arman-farah-welcome.jpg'),
+    bgImage: getAssetPath(EVENT_CONFIG.images.background),
+    avatarImage: getAssetPath(EVENT_CONFIG.images.avatar),
   };
 
   // Form states

@@ -1,5 +1,6 @@
 import { PHOTOBOOTH_STRIP_THEMES, PhotoboothStripTheme, StripSlot } from '@/components/Photobooth/stripThemes';
 import { PHOTO_FILTERS, PhotoFilter } from '@/components/PhotoFilterSelector';
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 export interface EventInfo {
   welcomeTitle: string;
@@ -60,11 +61,11 @@ export async function generatePhotoboothStripCanvas(
   themeId: PhotoboothStripTheme['id'],
   filterId: PhotoFilter['id'] = 'original',
   eventInfo: EventInfo = {
-    welcomeTitle: 'Atif & Isma',
-    miniTitle: 'Majlis Pertunangan',
-    date: '26 December 2026',
-    venue: 'OneTwoKL',
-    hashtag: '#AtifFoundIsma',
+    welcomeTitle: EVENT_CONFIG.title,
+    miniTitle: EVENT_CONFIG.eventType.ms,
+    date: EVENT_CONFIG.date.en,
+    venue: EVENT_CONFIG.venue,
+    hashtag: EVENT_CONFIG.hashtag,
   }
 ): Promise<string> {
   // Ensure custom web fonts are loaded prior to canvas text rendering

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 export type Language = 'en' | 'ms';
 
@@ -84,10 +85,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     language: 'English',
 
     // Cover & Event
-    miniTitle: 'Engagement Celebration',
-    date: '26 December 2026',
-    venue: 'OneTwoKL',
-    hashtag: '#AtifFoundIsma',
+    miniTitle: EVENT_CONFIG.eventType.en,
+    date: EVENT_CONFIG.date.en,
+    venue: EVENT_CONFIG.venue,
+    hashtag: EVENT_CONFIG.hashtag,
     welcomeMessage: 'Share your photos, videos, or heartfelt wishes captured with us today.',
     yourName: 'Your Name',
     enterNamePlaceholder: 'Enter your name...',
@@ -155,10 +156,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     language: 'Bahasa Melayu',
 
     // Cover & Event
-    miniTitle: 'Majlis Pertunangan',
-    date: '26 Disember 2026',
-    venue: 'OneTwoKL',
-    hashtag: '#AtifFoundIsma',
+    miniTitle: EVENT_CONFIG.eventType.ms,
+    date: EVENT_CONFIG.date.ms,
+    venue: EVENT_CONFIG.venue,
+    hashtag: EVENT_CONFIG.hashtag,
     welcomeMessage: 'Kongsi gambar, video, atau momen indah yang anda rakam bersama kami.',
     yourName: 'Nama anda',
     enterNamePlaceholder: 'Masukkan nama anda...',

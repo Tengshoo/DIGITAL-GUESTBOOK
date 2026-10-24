@@ -24,6 +24,7 @@ import { generatePhotoboothStripCanvas, downloadStripImage, EventInfo } from '@/
 import { uploadPhotoToGoogleDrive } from '@/lib/googleDrive';
 import { PHOTO_FILTERS, PhotoFilter } from '@/components/PhotoFilterSelector';
 import { useLanguage } from '@/lib/i18n';
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 interface PhotoboothStudioProps {
   onAttachToGuestbook?: (stripDataUrl: string) => void;
@@ -36,11 +37,11 @@ export default function PhotoboothStudio({
   onAttachToGuestbook,
   onClose,
   eventInfo = {
-    welcomeTitle: 'Atif & Isma',
-    miniTitle: 'Majlis Pertunangan',
-    date: '26 December 2026',
-    venue: 'OneTwoKL',
-    hashtag: '#AtifFoundIsma',
+    welcomeTitle: EVENT_CONFIG.title,
+    miniTitle: EVENT_CONFIG.eventType.ms,
+    date: EVENT_CONFIG.date.en,
+    venue: EVENT_CONFIG.venue,
+    hashtag: EVENT_CONFIG.hashtag,
   },
   isModal = false,
 }: PhotoboothStudioProps) {
