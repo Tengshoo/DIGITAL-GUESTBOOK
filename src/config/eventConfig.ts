@@ -68,5 +68,5 @@ export const EVENT_CONFIG = {
 
   // 10. Photo Upload Limit (Total allowed across Gallery, Selfie & Photobooth)
   // Set to 500 or any custom number. Change anytime!
-  photoUploadLimit: 500,
+  photoUploadLimit: 5000,
 };
