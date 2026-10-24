@@ -1,120 +1,200 @@
-# EverAfter — Event & Wedding Digital Guestbook
+# EverAfter — Luxury Event & Wedding Digital Guestbook & Photobooth Studio
 
-A modern, full-stack Event & Wedding Digital Guestbook application built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, and **SQLite (`better-sqlite3`)**.
+A modern, high-aesthetic Event & Wedding Digital Guestbook and Photobooth Web Application built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, and **Supabase Realtime**.
 
-Designed with celebration aesthetics (champagne gold, warm neutrals, soft blush rose, and subtle shadows), fully mobile-responsive, and optimized for live projection on large displays.
-
----
-
-## ✨ Features
-
-### 1. 📱 Memoira-Style Celebration Front Page (`/`)
-- **Cinematic Event Cover**: Full-bleed wedding venue backdrop (`/assets/img/demo-background-venue.jpg`) with dark ambient vignette, circular couple avatar portrait (`/assets/img/demo-welcome.png`) with champagne gold ring, event mini title (*"Majlis Perkahwinan"*), couple headline (*"Aiman & Dahlia"*), event metadata (Date & Venue), and welcoming message.
-- **Guest Name Entry & Direct Actions**:
-  - Name input box with smooth glassmorphism container.
-  - Primary CTA: **"Kongsikan Momen"** (Share Moments / Open Camera & Wishes Sheet).
-  - Secondary CTA: **"Buka Galeri & Live Wall"** (Direct link to `/wall`).
-  - Quick action shortcuts: 📸 Ambil Gambar, 💌 Tulis Ucapan, 🎙️ Mesej Suara.
-- **Interactive Submission Modal / Drawer**:
-  - Guest Name & Well Wishes.
-  - **Photo & Selfie Capture with 4 Filter Sets & Optional Cute Frames**: Direct smartphone camera capture or gallery upload with client-side image compression, 4 real-time filter styles, and aesthetic optional frames:
-    - **4 Filter Sets**: Original (Natural & True), Champagne Warm (Golden celebration glow), Classic Noir (Timeless monochrome B&W), and Blush Romance (Soft romantic rose tint).
-    - **Aesthetic & Cute Frames (Optional)**:
-      1. **No Frame** (Natural, borderless photo — default optional)
-      2. **Classic Polaroid** (Iconic vintage film border with handwritten *"forever & always ♡"*)
-      3. **Golden Elegance** (Champagne gold foil double hairline & corner sparkles `✦`)
-      4. **Cute Hearts** (Doodled pastel hearts, dashed borders & *"✨ so much love ✨"*)
-      5. **Blush Ribbon** (Soft rose wedding border with delicate stars & *"with love & joy ♡"*)
-  - **Voice Note Recorder**: Browser `MediaRecorder` API with live duration timer, waveform animation, and playback preview (exports base64 audio).
-- **Celebration Confetti**: Dynamic multi-stage confetti burst on submission (`canvas-confetti`) with a warm "Thank You!" view and an option to sign another note.
-
-### 2. 📺 Live Projector & Wall Mode (`/wall`)
-- **Cinematic Event Display**: Designed for a venue TV, projector, or LED event wall.
-- **Real-Time Polling**: Automatically polls `/api/entries` every 5 seconds for newly approved toasts.
-- **7-Second Auto-Cycle**: Smooth fade transitions with visual progress countdown.
-- **Polaroid Styling**: Displays photos with paper drop-shadows, calligraphy quotes, signatures, and inline voice note audio players.
-- **Wall Controls**:
-  - Fullscreen toggle (`F11` or on-screen button).
-  - Pause / Play / Next / Prev slideshow controls.
-  - Gallery Grid toggle (switch between Spotlight Slideshow and Grid Collage).
-  - On-screen **Guest QR Code Modal** so attendees can scan and sign right from the big screen!
-
-### 3. 🛡️ Host Moderation Dashboard (`/admin`)
-- **PIN Protected**: Default PIN is `1234` (configurable via `ADMIN_PIN` environment variable).
-- **Live Metrics**: Total Notes, Live on Screen, Hidden/Flagged, Notes with Photos, Voice Wishes.
-- **Fast Moderation**: Quick one-click "Approve / Hide" toggle to instantly control what appears on the projector wall.
-- **Search & Filter**: Search by guest name or message keywords; filter by All, Approved, or Hidden.
-- **Entry Deletion**: Safe deletion with confirmation prompt.
-- **Data Export**: One-click **CSV Export** and **JSON Backup** for the couple to keep forever.
-
-### 4. 🗄️ Backend API & SQLite Database
-- Database initialized in `src/lib/db.ts` with SQLite WAL mode (`better-sqlite3`).
-- Automatic table creation for `entries` (`id`, `name`, `message`, `photo_url`, `signature_svg`, `audio_url`, `is_approved`, `created_at`).
-- Seed sample celebration entries on first launch.
-- Endpoints:
-  - `GET /api/entries` — Returns approved entries ordered by `created_at DESC`.
-  - `POST /api/entries` — Validates and inserts a new guest submission.
-  - `GET /api/admin/entries` — Returns all entries (PIN protected).
-  - `PATCH /api/admin/entries` — Updates entry approval status (PIN protected).
-  - `DELETE /api/admin/entries` — Deletes entry (PIN protected).
+Designed specifically for celebration aesthetics (champagne gold, warm neutrals, soft rose, and glassmorphism), mobile-first responsiveness (optimized for iOS & Android), and live venue projection on projectors/LED walls. Fully deployable to **GitHub Pages** (or Cloudflare Pages/Vercel) with **zero server costs**.
 
 ---
 
-## 🚀 Getting Started
+## 🌟 Highlights & Key Features
+
+### 1. 📱 Celebration Front Cover & Guestbook (`/`)
+* **Cinematic Backdrop**: Full-bleed wedding venue backdrop photo with subtle contrast vignette, circular couple portrait with champagne gold foil styling, event date, venue location, and social media hashtag.
+* **Mobile-First UX**: Specifically prioritized and tested for iOS Safari and Android Chrome, followed by Mac/Windows desktop.
+* **Bilingual Switch**: Instant toggle between **English** and **Bahasa Melayu** (customizable in [`src/lib/i18n.tsx`](file:///src/lib/i18n.tsx)).
+* **Photo & Selfie Capture with Filters & Frames**:
+  * Smartphone camera capture or photo album upload with automatic client-side compression.
+  * **4 Real-Time Filters**: Original Natural, Champagne Warm, Classic Noir (B&W), and Blush Romance.
+  * **Aesthetic Picture Frames**: Borderless, Classic Polaroid (with handwritten calligraphy), Golden Elegance, Cute Hearts, and Blush Ribbon.
+* **Voice Note Recorder**: Browser-native voice recorder with live duration timer, waveform animations, and playback preview.
+* **Interactive Signature Pad**: Touch/stylus signature canvas to sign personal messages.
+* **Celebration Confetti**: Multi-stage celebration burst on submission (`canvas-confetti`) with an instant "Thank You" screen.
+
+---
+
+### 2. 📸 Photobooth Studio (`/photobooth`)
+* **Multi-Shot Photobooth Strips**: Interactive photobooth studio allowing guests to snap a sequence of photos with live countdown timers.
+* **Strip Personalization**: Choose background themes, custom stamps, filter styling, and event metadata tags.
+* **Instant Device Download**: Fast, high-resolution canvas export downloaded directly to the guest's mobile camera roll or PC.
+* **Live Wall Submission**: Guests can optionally submit their photobooth strip directly to the event's live cloud wall.
+
+---
+
+### 3. 📺 Live Projector & Wall Mode (`/wall`)
+* **Built for Big Screens**: Designed for venue projectors, LED walls, smart TVs, and monitors.
+* **Synchronized Backdrop**: Matches the home page backdrop with auto-contrast adjustment for maximum readability.
+* **Auto-Cycling Slideshow**: 7-second spotlight carousel with smooth progress animations and inline audio player for guest voice notes.
+* **Grid Modes**: Switch between fullscreen Spotlight mode and a **2×N Mobile Grid** / Desktop Masonry Collage.
+* **Real-Time Cloud Sync**: Instantly displays newly approved toasts and photos via Supabase Realtime without requiring page reloads.
+* **Scan-to-Sign QR Modal**: High-contrast QR code overlay allowing guests to scan and sign from their venue seats.
+
+---
+
+### 4. 🛡️ Host Moderation Dashboard (`/admin`)
+* **PIN Protection**: Fast numeric keypad login (`EVENT_CONFIG.adminPin`).
+* **Live Metric Counters**: Total Wishes, Approved on Screen, Hidden/Flagged, Photos Attached, Voice Notes.
+* **Photo Upload Limit Tracker**: Real-time counter (e.g. `142 / 500`) tracking uploads across Gallery, Selfies, and Photobooth strips.
+* **1-Click Moderation**: Approve or Hide messages in real time (powered by Supabase RLS policies).
+* **Data Backups**: One-click **CSV Export** for the couple and a direct shortcut button to the event's **Google Drive** folder.
+
+---
+
+### 5. 🛑 Configurable Photo Upload Limit (Default: 500)
+* Protects database and drive storage limits with a global cap set in [`src/config/eventConfig.ts`](file:///src/config/eventConfig.ts).
+* Encompasses all photo sources: Mobile Gallery Uploads, Camera Selfies, and Photobooth Strips.
+* **Friendly Fallback**: When the photo limit is reached, guest wishes (text notes & audio recordings) **remain open**, and guests can still snap and download photobooth strips locally.
+
+---
+
+### 6. ☁️ Architecture & Zero Hosting Costs
+* **Static Export (`output: 'export'`)**: Built as a pure static HTML/JS/CSS application for instantaneous CDN delivery.
+* **GitHub Pages Ready**: Preconfigured GitHub Actions workflow (`.github/workflows/deploy.yml`) builds and deploys on push to `main`.
+* **Multi-Tenant Supabase**: Use **one single Supabase project** across all customer events. Each event is isolated via a unique `eventId` without needing new database projects.
+* **Google Drive Integration**: Guest photos route directly to the couple's private Google Drive folder via Google Apps Script ([`google-drive-apps-script.js`](file:///google-drive-apps-script.js)).
+
+---
+
+## 🛠️ Quick Customer Onboarding Guide
+
+All customer-specific customizations are centralized into **one single configuration file**: [`src/config/eventConfig.ts`](file:///src/config/eventConfig.ts).
+
+```typescript
+export const EVENT_CONFIG = {
+  // Couple Names
+  title: 'Atif & Isma',
+
+  // Event Type
+  eventType: {
+    en: 'Engagement Celebration',
+    ms: 'Majlis Pertunangan',
+  },
+
+  // Event Date
+  date: {
+    en: '26 December 2026',
+    ms: '26 Disember 2026',
+    numeric: '26.12.2026',
+  },
+
+  // Venue & Hashtag
+  venue: 'OneTwoKL',
+  hashtag: '#AtifFoundIsma',
+
+  // Cover Photos (/public/assets/img/)
+  images: {
+    avatar: '/assets/img/customer-avatar.jpg',
+    background: '/assets/img/customer-venue.jpg',
+  },
+
+  // Supabase Isolation (Same project URL/key, unique eventId per customer)
+  supabase: {
+    eventId: 'atif-isma',
+  },
+
+  // Google Drive Integration
+  googleDrive: {
+    scriptUrl: 'https://script.google.com/macros/s/.../exec',
+    folderUrl: 'https://drive.google.com/drive/folders/...',
+  },
+
+  // Host Moderation PIN
+  adminPin: '1234',
+
+  // Photo Upload Limit
+  photoUploadLimit: 500,
+};
+```
+
+> 📖 **Full Step-by-Step Manual**: See [`CUSTOMER_SETUP_GUIDE.md`](file:///CUSTOMER_SETUP_GUIDE.md) for detailed instructions on preparing new events, Google Drive scripts, Supabase setup, and deployment.
+
+---
+
+## 💻 Local Development
 
 ### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Run the Development Server
+### 2. Start Dev Server
 ```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000) in your browser:
+* **Home Page**: `http://localhost:3000/`
+* **Photobooth Studio**: `http://localhost:3000/photobooth`
+* **Live Wall**: `http://localhost:3000/wall`
+* **Admin Dashboard**: `http://localhost:3000/admin` (Default PIN: `1234`)
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 3. Production Build & Run
+### 3. Production Static Build
 ```bash
 npm run build
-npm run start
 ```
+Generates the fully optimized static build inside the `/out` directory.
 
 ---
 
-## 🔑 Host Admin PIN
+## 🚀 Deployment to GitHub Pages
 
-- Default PIN: `1234`
-- To customize, set the environment variable in `.env.local`:
-  ```env
-  ADMIN_PIN=5678
-  ```
+1. In your GitHub repository, navigate to **Settings ➔ Pages**.
+2. Under **Build and deployment > Source**, select **GitHub Actions**.
+3. Push changes to the `main` branch:
+   ```bash
+   git add .
+   git commit -m "chore: setup event config"
+   git push origin main
+   ```
+4. GitHub Actions will automatically compile and publish the site within 60 seconds.
 
 ---
 
 ## 📂 Project Structure
 
 ```
-├── data/
-│   └── guestbook.db              # SQLite database (auto-created)
+├── .github/workflows/
+│   └── deploy.yml                # Automated GitHub Pages CI/CD workflow
+├── google-drive-apps-script.js   # Google Apps Script code for Drive uploads
+├── CUSTOMER_SETUP_GUIDE.md       # Complete onboarding SOP for new clients
+├── public/
+│   └── assets/img/               # Couple avatar & venue background assets
 ├── src/
 │   ├── app/
-│   │   ├── admin/page.tsx        # Host moderation dashboard
-│   │   ├── api/
-│   │   │   ├── admin/entries/    # Admin GET, PATCH, DELETE endpoints
-│   │   │   └── entries/          # Public GET, POST endpoints
+│   │   ├── admin/page.tsx        # Host moderation dashboard & metrics
+│   │   ├── photobooth/page.tsx   # Photobooth Studio page
 │   │   ├── wall/page.tsx         # Live projector wall & slideshow
-│   │   ├── globals.css           # Custom typography, fonts & luxury styles
+│   │   ├── globals.css           # Luxury styles, vignette & typography
 │   │   ├── layout.tsx            # Celebration layout & header navigation
-│   │   └── page.tsx              # Guest submission form
+│   │   └── page.tsx              # Main guestbook entry form & hero cover
 │   ├── components/
-│   │   ├── AudioPlayer.tsx          # Reusable voice note audio player
-│   │   ├── PhotoFilterSelector.tsx  # 4-set photo filter picker with canvas export
-│   │   ├── PhotoFrameSelector.tsx   # Aesthetic & cute frames with canvas export
-│   │   └── VoiceRecorder.tsx        # Voice recording with live preview
+│   │   ├── AudioPlayer.tsx       # Inline voice note audio player
+│   │   ├── PhotoFilterSelector.tsx # 4-set photo filter picker
+│   │   ├── PhotoFrameSelector.tsx  # Polaroid, gold & cute frames
+│   │   ├── Photobooth/           # Photobooth canvas, themes & strips
+│   │   ├── SignatureCanvas.tsx   # Digital handwriting signature canvas
+│   │   └── VoiceRecorder.tsx     # Voice recording with live audio timer
+│   ├── config/
+│   │   └── eventConfig.ts        # ⭐ Master customer configuration file
 │   └── lib/
-│       └── db.ts                 # better-sqlite3 database connection & queries
-├── next.config.mjs               # Next.js configuration (better-sqlite3 externals)
-├── tailwind.config.js            # Custom champagne, rose, and warm palettes
+│       ├── googleDrive.ts        # Google Drive upload client
+│       ├── i18n.tsx              # Bilingual English / Malay translation context
+│       ├── photoboothCanvas.ts   # Strip rendering and compositing engine
+│       └── supabase.ts           # Supabase client with eventId filtering & local fallback
+├── next.config.mjs               # Static export configuration
+├── tailwind.config.js            # Custom champagne, gold & luxury palettes
 └── tsconfig.json                 # TypeScript configuration
 ```
+
+---
+
+## 📄 License
+Created with ❤️ for weddings and celebrations.

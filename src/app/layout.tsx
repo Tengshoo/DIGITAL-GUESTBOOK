@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { LanguageProvider } from '@/lib/i18n';
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -12,14 +13,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Atif & Isma | Engagement Digital Guestbook & Live Wall',
+  title: `${EVENT_CONFIG.title} | ${EVENT_CONFIG.eventType?.en || 'Wedding'} Digital Guestbook & Live Wall`,
   description:
-    'Share your photos, videos, or heartfelt memories captured with us today.',
+    `Share your photos, videos, or heartfelt memories captured with us today. ${EVENT_CONFIG.hashtag}`,
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Atif & Isma',
+    title: EVENT_CONFIG.title,
   },
   other: {
     'mobile-web-app-capable': 'yes',
