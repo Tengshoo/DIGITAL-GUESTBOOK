@@ -41,7 +41,17 @@ export const EVENT_CONFIG = {
     background: '/assets/img/arman-farah-venue.png?v=2',
   },
 
-  // 7. Google Drive Photo Storage
+  // 7. Supabase Cloud Database (For Live Wall & Online Guestbook)
+  supabase: {
+    // TIP: You can use ONE single Supabase project across ALL your customers!
+    // Simply change the eventId below for each new customer.
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+    // Unique ID for this customer so wishes never mix with other events
+    eventId: 'atif-isma', // e.g. 'aiman-dahlia', 'sarah-daniel'
+  },
+
+  // 8. Google Drive Photo Storage
   googleDrive: {
     // Deployed Web App URL from script.google.com
     scriptUrl:
@@ -53,6 +63,6 @@ export const EVENT_CONFIG = {
       '',
   },
 
-  // 8. Host Admin PIN (Default PIN for /admin moderation page)
+  // 9. Host Admin PIN (Default PIN for /admin moderation page)
   adminPin: '1234',
 };

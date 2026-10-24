@@ -47,16 +47,26 @@ export const EVENT_CONFIG = {
     // Couple portrait avatar (circular image on cover)
     avatar: '/assets/img/customer-avatar.jpg',
     // Background venue image (full-bleed cinematic cover photo)
+    // Background venue image (full-bleed cinematic cover photo)
     background: '/assets/img/customer-venue.jpg',
   },
 
-  // 7. Google Drive Photo Storage
+  // 7. Supabase Database (Wishes & Live Wall)
+  supabase: {
+    // 💡 REUSE TIP: Keep the same url & anonKey for all your clients!
+    url: 'https://xyzcompany.supabase.co',
+    anonKey: 'eyJh...',
+    // Change this unique ID for each customer (e.g. 'aiman-dahlia'):
+    eventId: 'atif-isma',
+  },
+
+  // 8. Google Drive Photo Storage
   googleDrive: {
     scriptUrl: 'https://script.google.com/macros/s/.../exec',
     folderUrl: 'https://drive.google.com/drive/folders/YOUR_FOLDER_ID',
   },
 
-  // 8. Host Admin PIN (For /admin moderation dashboard)
+  // 9. Host Admin PIN (For /admin moderation dashboard)
   adminPin: '1234',                // Give this PIN to the couple/emcee
 };
 ```
@@ -97,7 +107,32 @@ Each customer should have their own private Google Drive folder where all their 
 
 ---
 
-## 🧪 Step 4: Test & Verify Locally
+## 🗄️ Step 4: Supabase Database (Do You Need a New Project? NO!)
+
+**Question**: *Do you need to create a brand new Supabase project for every customer repository?*
+**Answer**: **NO! You can use ONE single Supabase project across ALL your customer repositories.**
+
+Supabase free tier limits accounts to 2 active projects. To avoid paying or hitting limits, this project features **built-in multi-tenant event isolation**:
+
+### How it works:
+1. Keep the exact same `url` and `anonKey` from your main Supabase project in every customer's repo.
+2. In `src/config/eventConfig.ts`, simply give each customer a unique `eventId` (e.g. `'atif-isma'`, `'aiman-dahlia'`, `'sarah-daniel'`).
+3. The guestbook automatically stores and filters wishes by that `eventId`.
+4. Guests attending *Aiman & Dahlia's* wedding will **never** see wishes from *Atif & Isma's* wedding!
+
+```typescript
+supabase: {
+  url: 'https://your-main-project.supabase.co', // Same for all clients
+  anonKey: 'eyJhbGciOi...',                    // Same for all clients
+  eventId: 'aiman-dahlia',                     // ✨ ONLY change this per customer!
+}
+```
+
+> **Note**: If a VIP or corporate client ever requires their own dedicated Supabase database project for data compliance, you can simply paste their new project's `url` and `anonKey` into `eventConfig.ts`.
+
+---
+
+## 🧪 Step 5: Test & Verify Locally
 
 In your terminal, test the customer's website before building:
 
@@ -114,7 +149,7 @@ Visit the following pages in your browser:
 
 ---
 
-## 🚀 Step 5: Build & Deploy to Production
+## 🚀 Step 6: Build & Deploy to Production
 
 Once verified, compile the production build:
 
@@ -137,6 +172,7 @@ git push origin main
 - [ ] Updated Event Date (English, Malay, Numeric)
 - [ ] Updated Venue Location & Hashtag
 - [ ] Added Couple Avatar & Venue Backdrop into `public/assets/img/`
+- [ ] Set Unique Supabase `eventId` (e.g. `'aiman-dahlia'`) in `src/config/eventConfig.ts`
 - [ ] Configured Customer Google Drive Folder ID & Script URL
 - [ ] Set Host Admin PIN (Shared with the client/emcee)
 - [ ] Ran `npm run build` with 0 errors

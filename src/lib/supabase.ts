@@ -1,7 +1,9 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 export interface SupabaseGuestEntry {
   id: number;
+  event_id?: string;
   name: string;
   message: string;
   photo_url?: string | null;
@@ -11,8 +13,15 @@ export interface SupabaseGuestEntry {
   created_at: string;
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  EVENT_CONFIG.supabase?.url ||
+  '';
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  EVENT_CONFIG.supabase?.anonKey ||
+  '';
+const currentEventId = EVENT_CONFIG.supabase?.eventId || 'default';
 
 let supabaseInstance: SupabaseClient | null = null;
 
@@ -35,8 +44,8 @@ export function getSupabase(): SupabaseClient | null {
   return supabaseInstance;
 }
 
-// Sample fallback entries for demonstration when Supabase is not yet connected
-const LOCAL_STORAGE_KEY = 'everafter_guestbook_entries';
+// Scoped local storage key per customer event
+const LOCAL_STORAGE_KEY = `everafter_guestbook_entries_${currentEventId}`;
 
 const defaultFallbackEntries: SupabaseGuestEntry[] = [
   {
@@ -101,6 +110,7 @@ export async function submitGuestbookEntry(entry: {
     try {
       const { error } = await supabase.from('entries').insert([
         {
+          event_id: currentEventId,
           name: entry.name.trim(),
           message: entry.message.trim(),
           photo_url: entry.photo_url || null,
@@ -142,11 +152,16 @@ export async function getApprovedEntries(): Promise<SupabaseGuestEntry[]> {
 
   if (supabase) {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('entries')
         .select('*')
-        .eq('is_approved', 1)
-        .order('created_at', { ascending: false });
+        .eq('is_approved', 1);
+
+      if (currentEventId) {
+        query = query.eq('event_id', currentEventId);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) {
         console.error('Supabase fetch error:', error);
@@ -170,10 +185,13 @@ export async function getAllEntriesForAdmin(): Promise<SupabaseGuestEntry[]> {
 
   if (supabase) {
     try {
-      const { data, error } = await supabase
-        .from('entries')
-        .select('*')
-        .order('created_at', { ascending: false });
+      let query = supabase.from('entries').select('*');
+
+      if (currentEventId) {
+        query = query.eq('event_id', currentEventId);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) {
         console.error('Supabase admin fetch error:', error);
