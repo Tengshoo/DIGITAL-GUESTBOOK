@@ -42,7 +42,18 @@ export const EVENT_CONFIG = {
   // 5. Social Media Hashtag
   hashtag: '#AtifFoundIsma',       // e.g. '#AimanDahlia', '#ForeverSarah'
 
-  // 6. Cover Images (Place image files in /public/assets/img/)
+  // 6. Photobooth Studio Strip Customization
+  photobooth: {
+    // Couple names printed on photobooth strips (e.g. 'Atif & Isma', 'Fikri & Alya')
+    // Defaults to EVENT_CONFIG.title if left blank
+    coupleNames: 'Atif & Isma',
+    // Date printed on photobooth strips (e.g. '26.12.2026')
+    date: '26.12.2026',
+    // Custom tagline / subtitle for strips
+    tagline: 'romantic memories',
+  },
+
+  // 7. Cover Images (Place image files in /public/assets/img/)
   images: {
     // Couple portrait avatar (circular image on cover)
     avatar: '/assets/img/customer-avatar.jpg',
@@ -205,6 +216,7 @@ git push origin main
 ## 📌 Checklist for Every Customer
 
 - [ ] Updated Couple Names in `src/config/eventConfig.ts`
+- [ ] Configured Photobooth Strip couple names & date in `src/config/eventConfig.ts`
 - [ ] Updated Event Type (Wedding / Engagement / Reception)
 - [ ] Updated Event Date (English, Malay, Numeric)
 - [ ] Updated Venue Location & Hashtag
