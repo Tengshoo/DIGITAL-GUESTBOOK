@@ -44,7 +44,7 @@ export const EVENT_CONFIG = {
     date: '26.12.2026',
 
     // Tagline / Subtitle printed on photobooth strips
-    tagline: 'romantic memories',
+    tagline: 'The Engagement of',
   },
 
   // 7. Cover Photos (Save new photos in /public/assets/img/ folder)
