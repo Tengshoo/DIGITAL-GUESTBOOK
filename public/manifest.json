@@ -1,7 +1,7 @@
 {
-  "name": "Atif & Isma Wedding",
-  "short_name": "AtifIsma",
-  "description": "Digital Guestbook & Live Photobooth for Atif & Isma's Wedding Celebration",
+  "name": "Isma & Atif Engagement",
+  "short_name": "IsmaAtif",
+  "description": "Digital Guestbook & Live Photobooth for Isma & Atif's Engagement Celebration",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

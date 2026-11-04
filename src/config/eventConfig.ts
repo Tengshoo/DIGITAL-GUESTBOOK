@@ -12,7 +12,7 @@
 
 export const EVENT_CONFIG = {
   // 1. Couple or Event Main Names (e.g. 'Atif & Isma', 'Aiman & Dahlia')
-  title: 'Atif & Isma',
+  title: 'Isma & Atif',
 
   // 2. Event Type / Subtitle (Displayed above the main couple name)
   eventType: {
@@ -31,13 +31,13 @@ export const EVENT_CONFIG = {
   venue: 'OneTwoKL',
 
   // 5. Social Media Hashtag
-  hashtag: '#AtifFoundIsma',
+  hashtag: '#AtifoundIsma',
 
   // 6. Photobooth Studio Strip Customization
   photobooth: {
     // Couple names printed on the photobooth strips (e.g. 'Atif & Isma', 'Fikri & Alya')
     // If left blank or omitted, it automatically uses EVENT_CONFIG.title
-    coupleNames: 'Atif & Isma',
+    coupleNames: 'Isma & Atif',
 
     // Date printed on photobooth strips (e.g. '26.12.2026' or '26 Dec 2026')
     // If left blank or omitted, it automatically uses EVENT_CONFIG.date.numeric
@@ -74,10 +74,10 @@ export const EVENT_CONFIG = {
     scriptUrl:
       process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
       'https://script.google.com/macros/s/AKfycbxmqBSEM_3emvagMiClkb9yN1VNalC7joWLkYymvi8fk14xq1SexXeeIs2JS88zX27-/exec',
-    // Direct link to the customer's Google Drive folder (leave empty if not needed)
+    // Direct link to the customer's Google Drive folder (or Folder ID) for the Host Admin button (e.g. 'https://drive.google.com/drive/folders/1a2b3c...')
     folderUrl:
       process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_URL ||
-      '',
+      'https://drive.google.com/drive/my-drive',
   },
 
   // 10. Host Admin PIN (Default PIN for /admin moderation page)
