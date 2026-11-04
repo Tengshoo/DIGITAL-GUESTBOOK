@@ -95,7 +95,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     shareMomentBtn: 'Share Your Wishes',
     photoboothBtn: '📸 Photobooth Studio (6 Strip Styles)',
     liveWallBtn: 'Open Gallery & Live Wall',
-    footerCelebration: 'memoira • {title} Engagement Celebration',
+    footerCelebration: `memoira • {title} ${EVENT_CONFIG.eventType?.en || 'Wedding Celebration'}`,
 
     // Guestbook Modal
     modalTitle: 'Leave a Memory & Wish',
@@ -103,10 +103,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     wishesLabel: 'Heartfelt Wishes & Blessings',
     wishesPlaceholder: 'Write your warmest wishes, congratulations, or lovely memories...',
     charsCount: 'characters',
-    photoLabel: 'Photo / Selfie (Optional)',
+    photoLabel: 'Photos / Selfies (Optional • Up to 10)',
     photoboothModalBtn: '✨ Snap Photobooth Strip (6 Strip Styles)',
     selfieBtn: 'Selfie',
-    choosePhotoBtn: 'Choose Photo',
+    choosePhotoBtn: 'Choose Photos',
     removePhoto: 'Remove photo',
     filterSelectTitle: 'Select Photo Filter',
     frameSelectTitle: 'Select Aesthetic Frame',
@@ -166,7 +166,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     shareMomentBtn: 'Kongsikan Momen',
     photoboothBtn: '📸 Studio Photobooth (6 Pilihan Strip)',
     liveWallBtn: 'Buka Galeri & Live Wall',
-    footerCelebration: 'memoira • Sambutan Pertunangan {title}',
+    footerCelebration: `memoira • ${EVENT_CONFIG.eventType?.ms || 'Majlis Perkahwinan'} {title}`,
 
     // Guestbook Modal
     modalTitle: 'Tinggalkan Momen & Ucapan',
@@ -174,7 +174,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     wishesLabel: 'Ucapan & Doa Tulus',
     wishesPlaceholder: 'Tuliskan ucapan tahniah, doa keberkatan, atau memori bersama pasangan...',
     charsCount: 'aksara',
-    photoLabel: 'Gambar / Selfie (Pilihan)',
+    photoLabel: 'Gambar / Selfie (Pilihan • Sehingga 10)',
     photoboothModalBtn: '✨ Ambil Strip Photobooth (6 Pilihan Gaya)',
     selfieBtn: 'Selfie',
     choosePhotoBtn: 'Pilih Gambar',

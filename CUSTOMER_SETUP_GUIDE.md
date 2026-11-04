@@ -42,18 +42,7 @@ export const EVENT_CONFIG = {
   // 5. Social Media Hashtag
   hashtag: '#AtifFoundIsma',       // e.g. '#AimanDahlia', '#ForeverSarah'
 
-  // 6. Photobooth Studio Strip Customization
-  photobooth: {
-    // Couple names printed on photobooth strips (e.g. 'Atif & Isma', 'Fikri & Alya')
-    // Defaults to EVENT_CONFIG.title if left blank
-    coupleNames: 'Atif & Isma',
-    // Date printed on photobooth strips (e.g. '26.12.2026')
-    date: '26.12.2026',
-    // Custom tagline / subtitle for strips
-    tagline: 'romantic memories',
-  },
-
-  // 7. Cover Images (Place image files in /public/assets/img/)
+  // 6. Cover Images (Place image files in /public/assets/img/)
   images: {
     // Couple portrait avatar (circular image on cover)
     avatar: '/assets/img/customer-avatar.jpg',
@@ -165,12 +154,9 @@ supabase: {
 > **Note**: If a VIP or corporate client ever requires their own dedicated Supabase database project for data compliance, you can simply paste their new project's `url` and `anonKey` into `eventConfig.ts`.
 
 ### ⚙️ One-Time Supabase Setup (Only needed once on your main project)
-In your Supabase project's **SQL Editor**, run [`supabase_schema.sql`](file:///supabase_schema.sql) (or run this quick command to ensure error-free moderation):
-```sql
--- Ensure event_id exists and disable RLS so /admin can approve/hide without restriction
-alter table public.entries add column if not exists event_id text default 'default';
-alter table public.entries disable row level security;
-```
+In your Supabase project's **SQL Editor**, paste and run [`supabase_schema.sql`](file:///supabase_schema.sql). This configures:
+- Row Level Security (RLS) so public visitors can only view approved wishes and submit valid entries, and blocks bulk public `UPDATE`/`DELETE` calls.
+- Multi-tenant RPC moderation functions (`admin_get_entries`, `admin_update_entry_approval`, `admin_delete_entry`) so `/admin` moderation is strictly isolated per `event_id` while working automatically with `adminPin` in [`src/config/eventConfig.ts`](file:///src/config/eventConfig.ts).
 
 ---
 
@@ -216,7 +202,6 @@ git push origin main
 ## 📌 Checklist for Every Customer
 
 - [ ] Updated Couple Names in `src/config/eventConfig.ts`
-- [ ] Configured Photobooth Strip couple names & date in `src/config/eventConfig.ts`
 - [ ] Updated Event Type (Wedding / Engagement / Reception)
 - [ ] Updated Event Date (English, Malay, Numeric)
 - [ ] Updated Venue Location & Hashtag
