@@ -34,7 +34,7 @@ export interface StripTextBlock {
   fontWeight: number | string;
   color: string;
   align: 'left' | 'center' | 'right';
-  binding: 'event.name' | 'event.date' | 'event.venue' | 'event.hashtag' | 'custom';
+  binding: 'event.name' | 'event.tagline' | 'event.date' | 'event.venue' | 'event.hashtag' | 'custom';
   text?: string;
   uppercase?: boolean;
 }
@@ -123,14 +123,29 @@ export const PHOTOBOOTH_STRIP_THEMES: PhotoboothStripTheme[] = [
     ],
     textBlocks: [
       {
+        id: 'event-tagline',
+        x: 257.63,
+        y: 1626,
+        width: 529.08,
+        height: 30,
+        rotation: 3.541,
+        fontFamily: "'Cinzel', Georgia, serif",
+        fontSize: 20,
+        fontWeight: 600,
+        color: '#6B5A4E',
+        align: 'center',
+        binding: 'event.tagline',
+        uppercase: true,
+      },
+      {
         id: 'couple-name',
         x: 257.63,
-        y: 1618,
+        y: 1662,
         width: 529.08,
         height: 65,
         rotation: 3.541,
         fontFamily: "'Dancing Script', cursive",
-        fontSize: 54,
+        fontSize: 52,
         fontWeight: 700,
         color: '#261E18',
         align: 'center',
@@ -140,12 +155,12 @@ export const PHOTOBOOTH_STRIP_THEMES: PhotoboothStripTheme[] = [
       {
         id: 'event-date',
         x: 371.19,
-        y: 1730,
+        y: 1740,
         width: 272.11,
         height: 35,
         rotation: 3.094,
         fontFamily: "'Cinzel', Georgia, serif",
-        fontSize: 26,
+        fontSize: 24,
         fontWeight: 600,
         color: '#4A3E36',
         align: 'center',
@@ -264,9 +279,24 @@ export const PHOTOBOOTH_STRIP_THEMES: PhotoboothStripTheme[] = [
     ],
     textBlocks: [
       {
+        id: 'event-tagline',
+        x: 126.18,
+        y: 980,
+        width: 827.63,
+        height: 36,
+        rotation: -7.131,
+        fontFamily: "'Courier Prime', monospace",
+        fontSize: 22,
+        fontWeight: 600,
+        color: '#4B5563',
+        align: 'left',
+        binding: 'event.tagline',
+        uppercase: true,
+      },
+      {
         id: 'couple-name',
         x: 126.18,
-        y: 1013.26,
+        y: 1018,
         width: 827.63,
         height: 77.1,
         rotation: -7.131,
@@ -387,11 +417,26 @@ export const PHOTOBOOTH_STRIP_THEMES: PhotoboothStripTheme[] = [
     ],
     textBlocks: [
       {
+        id: 'event-tagline',
+        x: 50,
+        y: 1968,
+        width: 600,
+        height: 32,
+        rotation: 0,
+        fontFamily: "'Montserrat', sans-serif",
+        fontSize: 18,
+        fontWeight: 500,
+        color: '#6B5E55',
+        align: 'center',
+        binding: 'event.tagline',
+        uppercase: true,
+      },
+      {
         id: 'couple-name',
         x: 50,
-        y: 2020,
+        y: 2010,
         width: 600,
-        height: 60,
+        height: 55,
         rotation: 0,
         fontFamily: "'Cinzel', Georgia, serif",
         fontSize: 34,
@@ -404,7 +449,7 @@ export const PHOTOBOOTH_STRIP_THEMES: PhotoboothStripTheme[] = [
       {
         id: 'event-date',
         x: 50,
-        y: 2090,
+        y: 2075,
         width: 600,
         height: 35,
         rotation: 0,
