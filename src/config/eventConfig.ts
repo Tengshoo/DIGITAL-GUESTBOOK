@@ -12,7 +12,7 @@
 
 export const EVENT_CONFIG = {
   // 1. Couple or Event Main Names (e.g. 'Atif & Isma', 'Aiman & Dahlia')
-  title: 'Isma & Atif',
+  title: 'Ismasari & Atif',
 
   // 2. Event Type / Subtitle (Displayed above the main couple name)
   eventType: {
@@ -37,7 +37,7 @@ export const EVENT_CONFIG = {
   photobooth: {
     // Couple names printed on the photobooth strips (e.g. 'Atif & Isma', 'Fikri & Alya')
     // If left blank or omitted, it automatically uses EVENT_CONFIG.title
-    coupleNames: 'Isma & Atif',
+    coupleNames: 'Ismasari & Atif',
 
     // Date printed on photobooth strips (e.g. '26.12.2026' or '26 Dec 2026')
     // If left blank or omitted, it automatically uses EVENT_CONFIG.date.numeric
