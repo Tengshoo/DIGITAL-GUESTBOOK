@@ -77,11 +77,11 @@ export const EVENT_CONFIG = {
     // Direct link to the customer's Google Drive folder (or Folder ID) for the Host Admin button (e.g. 'https://drive.google.com/drive/folders/1a2b3c...')
     folderUrl:
       process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_URL ||
-      'https://drive.google.com/drive/my-drive',
+      'https://drive.google.com/drive/folders/1NJYY2_pMBltZC2ynqJpWiScl-1JoTFft?usp=drive_link',
   },
 
   // 10. Host Admin PIN (Default PIN for /admin moderation page)
-  adminPin: '1234',
+  adminPin: '0306',
 
   // 11. Photo Upload Limit (Total allowed across Gallery, Selfie & Photobooth)
   // Set to 500 or any custom number. Change anytime!
