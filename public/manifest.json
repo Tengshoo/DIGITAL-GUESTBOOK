@@ -9,13 +9,13 @@
   "theme_color": "#181310",
   "icons": [
     {
-      "src": "/assets/img/arman-farah-welcome.jpg",
+      "src": "/assets/img/Atif-Isma-Welcome.jpg",
       "sizes": "192x192",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/assets/img/arman-farah-welcome.jpg",
+      "src": "/assets/img/Atif-Isma-Welcome.jpg",
       "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"

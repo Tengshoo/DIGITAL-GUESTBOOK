@@ -50,7 +50,7 @@ export const EVENT_CONFIG = {
   // 7. Cover Photos (Save new photos in /public/assets/img/ folder)
   images: {
     // Couple portrait avatar (circular photo on front page cover)
-    avatar: '/assets/img/arman-farah-welcome.jpg',
+    avatar: '/assets/img/Atif-Isma-Welcome.jpg',
     // Background venue image (full-bleed cinematic cover photo)
     background: '/assets/img/arman-farah-venue.png?v=2',
   },

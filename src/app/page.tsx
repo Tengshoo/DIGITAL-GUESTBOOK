@@ -457,7 +457,7 @@ export default function GuestbookPage() {
             <img
               src={eventDetails.avatarImage}
               alt={eventDetails.welcomeTitle}
-              className="w-full h-full object-cover object-top"
+              className="w-full h-full object-cover object-[center_35%]"
             />
           </div>
           <div className="absolute -bottom-2 -right-1 w-8 h-8 rounded-full bg-champagne-500 text-white flex items-center justify-center shadow-md border-2 border-white">
