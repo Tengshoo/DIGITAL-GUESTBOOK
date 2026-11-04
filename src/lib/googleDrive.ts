@@ -20,7 +20,11 @@ export function isGoogleDriveConfigured(): boolean {
 }
 
 export function getGoogleDriveFolderUrl(): string {
-  const raw = (GOOGLE_DRIVE_FOLDER_URL || '').trim();
+  const raw = (
+    EVENT_CONFIG.googleDrive.folderUrl ||
+    process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_URL ||
+    ''
+  ).trim();
   if (!raw) {
     return 'https://drive.google.com/drive/my-drive';
   }

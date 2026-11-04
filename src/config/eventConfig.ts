@@ -76,7 +76,6 @@ export const EVENT_CONFIG = {
       'https://script.google.com/macros/s/AKfycbxmqBSEM_3emvagMiClkb9yN1VNalC7joWLkYymvi8fk14xq1SexXeeIs2JS88zX27-/exec',
     // Direct link to the customer's Google Drive folder (or Folder ID) for the Host Admin button (e.g. 'https://drive.google.com/drive/folders/1a2b3c...')
     folderUrl:
-      process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_URL ||
       'https://drive.google.com/drive/folders/1NJYY2_pMBltZC2ynqJpWiScl-1JoTFft?usp=drive_link',
   },
 
