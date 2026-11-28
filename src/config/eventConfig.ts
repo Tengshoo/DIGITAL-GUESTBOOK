@@ -4,8 +4,8 @@
  * =========================================================================
  * 
  * Edit this ONE file for every customer/event!
- * All pages (Cover, Guestbook, Photobooth Studio, Live Wall, and Admin Dashboard)
- * will automatically update with these details.
+ * All pages (Cover, Guestbook, Live Selfie Camera, Photobooth Studio,
+ * Live Wall, and Admin Dashboard) will automatically update with these details.
  * 
  * =========================================================================
  */
@@ -53,12 +53,34 @@ export const EVENT_CONFIG = {
     tagline: 'The Engagement of',
   },
 
+  // 6b. Live Selfie Camera Customization (9:16 Story Frames & 30s Video)
+  selfie: {
+    // Default selected 9:16 frame when opening Selfie Camera:
+    // 'wds01' | 'royal-lace' | 'editorial-vogue' | 'minimal-arch' | 'botanical-monogram' | 'retro-cam' | 'polaroid-chin' | 'none'
+    defaultFrame: 'wds01',
+
+    // Couple names printed on 9:16 selfie frames (falls back to photobooth.coupleNames or title)
+    coupleNames: 'Ismasari & Atif',
+
+    // Header subtitle printed on 9:16 selfie frames (e.g. 'The Engagement of', 'The Wedding of')
+    tagline: 'The Engagement of',
+
+    // Full date printed on 9:16 selfie frames (falls back to date.en)
+    date: '26 December 2026',
+
+    // Top-left status badge inside the Selfie Camera (leave blank for auto EN/BM translation)
+    badgeText: '',
+
+    // Enable 30-second video recording mode alongside Photo mode
+    allowVideo: true,
+  },
+
   // 7. Cover Photos (Save new photos in /public/assets/img/ folder)
   images: {
     // Couple portrait avatar (circular photo on front page cover)
-    avatar: '/assets/img/Atif-Isma-Welcome.jpg',
+    avatar: '/assets/img/Atif-Isma-Welcome.webp',
     // Background venue image (full-bleed cinematic cover photo)
-    background: '/assets/img/arman-farah-venue.png?v=2',
+    background: '/assets/img/arman-farah-venue.webp',
   },
 
   // 8. Supabase Cloud Database (For Live Wall & Online Guestbook)
@@ -80,7 +102,7 @@ export const EVENT_CONFIG = {
     scriptUrl:
       process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
       'https://script.google.com/macros/s/AKfycbxmqBSEM_3emvagMiClkb9yN1VNalC7joWLkYymvi8fk14xq1SexXeeIs2JS88zX27-/exec',
-    // Direct link to the customer's Google Drive folder (or Folder ID) for the Host Admin button (e.g. 'https://drive.google.com/drive/folders/1a2b3c...')
+    // Direct link to the customer's Google Drive folder (or Folder ID) for the Host Admin button
     folderUrl:
       'https://drive.google.com/drive/folders/1NJYY2_pMBltZC2ynqJpWiScl-1JoTFft?usp=drive_link',
   },
